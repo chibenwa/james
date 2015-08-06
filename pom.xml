@@ -58,13 +58,14 @@
         <module>karaf/features</module>
         <module>karaf/integration</module>
 
-        <module>container/util</module>
+        <module>container/cassandra-guice</module>
         <module>container/cli</module>
-        <module>container/spring</module>
         <module>container/core</module>
+        <module>container/filesystem-api</module>
         <module>container/lifecycle-api</module>
         <module>container/mailbox-adapter</module>
-        <module>container/filesystem-api</module>
+        <module>container/spring</module>
+        <module>container/util</module>
 
         <module>mailet/mailetcontainer-api</module>
         <module>mailet/mailetcontainer-camel</module>
@@ -180,6 +181,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.james</groupId>
+                <artifactId>cassandra-guice</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.ops4j.pax.logging</groupId>
                 <artifactId>pax-logging-api</artifactId>
