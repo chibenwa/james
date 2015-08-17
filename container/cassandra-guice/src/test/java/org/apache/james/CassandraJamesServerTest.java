@@ -32,6 +32,7 @@ import org.apache.james.mailbox.elasticsearch.utils.TestingClientProvider;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
 import org.apache.james.modules.protocols.IMAPServerModule;
+import org.apache.james.modules.protocols.POP3ServerModule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,8 +46,7 @@ public class CassandraJamesServerTest {
 
     private static final CassandraClusterSingleton CASSANDRA = CassandraClusterSingleton.build();
     private static final int IMAP_PORT = 1143; // You need to be root (superuser) to bind to ports under 1024.
-    public static final String USER = "user";
-    public static final String PASSWORD = "password";
+    private static final int POP3_PORT = 1110; // You need to be root (superuser) to bind to ports under 1024.
 
     private TestCassandraJamesServer server;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -87,6 +87,14 @@ public class CassandraJamesServerTest {
             return IMAP_PORT;
         }
     }
+
+    private class TestPOP3ServerModule extends POP3ServerModule {
+
+        @Override
+        protected int pop3Port() {
+            return POP3_PORT;
+        }
+    }
     
     private class TestCassandraJamesServer extends CassandraJamesServer {
 
@@ -106,6 +114,11 @@ public class CassandraJamesServerTest {
         @Override
         protected IMAPServerModule imapServerModule() {
             return new TestIMAPServerModule();
+        }
+
+        @Override
+        protected POP3ServerModule pop3ServerModule() {
+            return new TestPOP3ServerModule();
         }
 
         @Override
@@ -130,15 +143,29 @@ public class CassandraJamesServerTest {
 
     @Test (expected = AuthenticationFailedException.class)
     public void connectIMAPServerShouldThrowWhenNoCredentials() throws Exception {
-        store().connect();
+        IMAPstore().connect();
     }
 
-    private Store store() throws NoSuchProviderException {
+    @Test (expected = AuthenticationFailedException.class)
+    public void connectPOP3ServerShouldThrowWhenNoCredentials() throws Exception {
+        POP3store().connect();
+    }
+
+    private Store IMAPstore() throws NoSuchProviderException {
         Properties properties = new Properties();
         properties.put("mail.imap.host", "localhost");
         properties.put("mail.imap.port", String.valueOf(IMAP_PORT));
         Session session = Session.getDefaultInstance(properties);
         session.setDebug(true);
         return session.getStore("imap");
+    }
+
+    private Store POP3store() throws NoSuchProviderException {
+        Properties properties = new Properties();
+        properties.put("mail.pop3.host", "localhost");
+        properties.put("mail.pop3.port", String.valueOf(POP3_PORT));
+        Session session = Session.getDefaultInstance(properties);
+        session.setDebug(true);
+        return session.getStore("pop3");
     }
 }

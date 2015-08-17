@@ -21,6 +21,7 @@ package org.apache.james;
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
+import org.apache.james.modules.protocols.POP3ServerModule;
 import org.apache.james.modules.server.DNSServiceModule;
 import org.apache.james.modules.server.JpaDomainListModule;
 import org.apache.james.modules.protocols.IMAPServerModule;
@@ -37,7 +38,8 @@ public class CassandraJamesServer {
                 new JpaUsersRepositoryModule(),
                 new JpaDomainListModule(),
                 new DNSServiceModule(),
-                imapServerModule());
+                imapServerModule(),
+                pop3ServerModule());
     }
 
     public void stop() {
@@ -53,5 +55,9 @@ public class CassandraJamesServer {
 
     protected IMAPServerModule imapServerModule() {
         return new IMAPServerModule();
+    }
+
+    protected POP3ServerModule pop3ServerModule() {
+        return new POP3ServerModule();
     }
 }
