@@ -51,7 +51,6 @@ public class CassandraMailboxModule extends AbstractModule {
         bind(Authenticator.class).to(UserRepositoryAuthenticator.class);
 
         bind(new TypeLiteral<ModSeqProvider<CassandraId>>(){}).to(new TypeLiteral<CassandraModSeqProvider>(){});
-        bind(new TypeLiteral<UidProvider<CassandraId>>(){}).to(new TypeLiteral<CassandraUidProvider>() {
-        });
+        bind(new TypeLiteral<UidProvider<CassandraId>>(){}).to(new TypeLiteral<CassandraUidProvider>() {});
     }
 }
