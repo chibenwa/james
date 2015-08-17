@@ -20,6 +20,7 @@ package org.apache.james;
 
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
+import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
 import org.apache.james.modules.server.DNSServiceModule;
 import org.apache.james.modules.server.JpaDomainListModule;
 import org.apache.james.modules.protocols.IMAPServerModule;
@@ -32,6 +33,7 @@ public class CassandraJamesServer {
     public void start() {
         Guice.createInjector(new CassandraMailboxModule(),
                 cassandraSessionModule(),
+                elasticSearchMailboxModule(),
                 new JpaUsersRepositoryModule(),
                 new JpaDomainListModule(),
                 new DNSServiceModule(),
@@ -43,6 +45,10 @@ public class CassandraJamesServer {
 
     protected CassandraSessionModule cassandraSessionModule() {
         return new CassandraSessionModule();
+    }
+
+    protected ElasticSearchMailboxModule elasticSearchMailboxModule() {
+        return new ElasticSearchMailboxModule();
     }
 
     protected IMAPServerModule imapServerModule() {
