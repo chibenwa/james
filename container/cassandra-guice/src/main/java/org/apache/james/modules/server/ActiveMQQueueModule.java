@@ -20,15 +20,14 @@
 package org.apache.james.modules.server;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
 import org.apache.james.queue.api.MailQueueFactory;
-
-import javax.jms.ConnectionFactory;
 
 public class ActiveMQQueueModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(MailQueueFactory.class).toProvider(ActiveMQProvider.class);
+        bind(MailQueueFactory.class).annotatedWith(Names.named("mailqueuefactory")).toProvider(ActiveMQProvider.class);
     }
 
 }
