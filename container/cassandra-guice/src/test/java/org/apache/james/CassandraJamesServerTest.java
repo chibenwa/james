@@ -22,6 +22,7 @@ import java.util.Properties;
 
 import javax.mail.*;
 
+import com.google.inject.Guice;
 import org.apache.james.mailbox.cassandra.CassandraClusterSingleton;
 import org.apache.james.mailbox.cassandra.ClusterProvider;
 import org.apache.james.mailbox.elasticsearch.*;
