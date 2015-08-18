@@ -20,10 +20,7 @@ package org.apache.james;
 
 import java.util.Properties;
 
-import javax.mail.AuthenticationFailedException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
+import javax.mail.*;
 
 import org.apache.james.mailbox.cassandra.CassandraClusterSingleton;
 import org.apache.james.mailbox.cassandra.ClusterProvider;
@@ -33,6 +30,9 @@ import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
 import org.apache.james.modules.protocols.IMAPServerModule;
 import org.apache.james.modules.protocols.POP3ServerModule;
+import org.apache.james.modules.protocols.ProtocolHandlerModule;
+import org.apache.james.modules.protocols.SMTPServerModule;
+import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,6 +47,7 @@ public class CassandraJamesServerTest {
     private static final CassandraClusterSingleton CASSANDRA = CassandraClusterSingleton.build();
     private static final int IMAP_PORT = 1143; // You need to be root (superuser) to bind to ports under 1024.
     private static final int POP3_PORT = 1110; // You need to be root (superuser) to bind to ports under 1024.
+    public static final int SMTP_PORT = 10025;
 
     private TestCassandraJamesServer server;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -90,9 +91,25 @@ public class CassandraJamesServerTest {
 
     private class TestPOP3ServerModule extends POP3ServerModule {
 
+        public TestPOP3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+            super(protocolHandlerLoader);
+        }
+
         @Override
         protected int pop3Port() {
             return POP3_PORT;
+        }
+    }
+
+    private class TestSMTPServerModule extends SMTPServerModule {
+
+        public TestSMTPServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+            super(protocolHandlerLoader);
+        }
+
+        @Override
+        protected int smtpPort() {
+            return SMTP_PORT;
         }
     }
     
@@ -117,13 +134,18 @@ public class CassandraJamesServerTest {
         }
 
         @Override
-        protected POP3ServerModule pop3ServerModule() {
-            return new TestPOP3ServerModule();
+        protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+            return new TestPOP3ServerModule(protocolHandlerLoader);
         }
 
         @Override
         protected ElasticSearchMailboxModule elasticSearchMailboxModule() {
             return new TestElasticSearchMailboxModule(clientProvider);
+        }
+
+        @Override
+        protected SMTPServerModule smtpServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+            return new TestSMTPServerModule(protocolHandlerLoader);
         }
     }
 
@@ -151,6 +173,11 @@ public class CassandraJamesServerTest {
         POP3store().connect();
     }
 
+    @Test
+    public void connectSMTPServerShouldNotThrowWhenNoCredentials() throws Exception {
+        SMTPTransport().connect();
+    }
+
     private Store IMAPstore() throws NoSuchProviderException {
         Properties properties = new Properties();
         properties.put("mail.imap.host", "localhost");
@@ -167,5 +194,14 @@ public class CassandraJamesServerTest {
         Session session = Session.getDefaultInstance(properties);
         session.setDebug(true);
         return session.getStore("pop3");
+    }
+
+    private Transport SMTPTransport() throws NoSuchProviderException {
+        Properties properties = new Properties();
+        properties.put("mail.smtp.host", "localhost");
+        properties.put("mail.smtp.port", String.valueOf(SMTP_PORT));
+        Session session = Session.getDefaultInstance(properties);
+        session.setDebug(true);
+        return session.getTransport("smtp");
     }
 }

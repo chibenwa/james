@@ -23,8 +23,6 @@ import java.net.InetSocketAddress;
 import javax.inject.Inject;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.james.container.spring.filesystem.ResourceLoaderFileSystem;
-import org.apache.james.filesystem.api.FileSystem;
 import org.apache.james.imap.api.process.ImapProcessor;
 import org.apache.james.imap.decode.ImapDecoder;
 import org.apache.james.imap.encode.ImapEncoder;
@@ -60,9 +58,6 @@ public class IMAPServerModule extends AbstractModule {
 
         DefaultImapEncoderFactory defaultImapEncoderFactory = new DefaultImapEncoderFactory();
         bind(ImapEncoder.class).annotatedWith(Names.named("imapEncoder")).toInstance(defaultImapEncoderFactory.buildImapEncoder());
-
-        ResourceLoaderFileSystem resourceLoaderFileSystem = new ResourceLoaderFileSystem();
-        bind(FileSystem.class).annotatedWith(Names.named("filesystem")).toInstance(resourceLoaderFileSystem);
     }
 
     protected int imapPort() {

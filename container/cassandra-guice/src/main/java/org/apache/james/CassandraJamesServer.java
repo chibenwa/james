@@ -18,31 +18,51 @@
  ****************************************************************/
 package org.apache.james;
 
+import com.google.common.base.Throwables;
+import com.google.inject.Injector;
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
-import org.apache.james.modules.protocols.POP3ServerModule;
+import org.apache.james.modules.protocols.*;
 import org.apache.james.modules.server.ActiveMQQueueModule;
 import org.apache.james.modules.server.DNSServiceModule;
 import org.apache.james.modules.server.JpaDomainListModule;
-import org.apache.james.modules.protocols.IMAPServerModule;
 import org.apache.james.modules.server.JpaUsersRepositoryModule;
 
 import com.google.inject.Guice;
+import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
+import org.apache.james.smtpserver.netty.SMTPServer;
 
 public class CassandraJamesServer {
 
     public void start() {
-        Guice.createInjector(new CassandraMailboxModule(),
+        Injector injector = resolveInjections();
+        postInit(injector);
+    }
+
+    private Injector resolveInjections() {
+        Injector parentInjector = Guice.createInjector(new CassandraMailboxModule(),
             cassandraSessionModule(),
             elasticSearchMailboxModule(),
             new JpaUsersRepositoryModule(),
             new JpaDomainListModule(),
             new DNSServiceModule(),
-            imapServerModule(),
-            pop3ServerModule(),
+            new ProtocolHandlerModule(),
             new ActiveMQQueueModule()
         );
+        ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
+        return parentInjector.createChildInjector(imapServerModule(),
+            pop3ServerModule(loader),
+            smtpServerModule(loader)
+        );
+    }
+
+    private void postInit(Injector injector) {
+        try {
+            injector.getInstance(SMTPServer.class).init();
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     public void stop() {
@@ -60,7 +80,12 @@ public class CassandraJamesServer {
         return new IMAPServerModule();
     }
 
-    protected POP3ServerModule pop3ServerModule() {
-        return new POP3ServerModule();
+    protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+        return new POP3ServerModule(protocolHandlerLoader);
     }
+
+    protected SMTPServerModule smtpServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+        return new SMTPServerModule(protocolHandlerLoader);
+    }
+
 }

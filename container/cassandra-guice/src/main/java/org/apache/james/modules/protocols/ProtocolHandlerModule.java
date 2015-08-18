@@ -19,32 +19,22 @@
 
 package org.apache.james.modules.protocols;
 
-import com.google.common.base.Throwables;
-import com.google.inject.Injector;
-import org.apache.commons.configuration.Configuration;
-import org.apache.james.protocols.api.handler.LifecycleAwareProtocolHandler;
-import org.apache.james.protocols.api.handler.ProtocolHandler;
-import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
-import org.apache.james.protocols.lib.lifecycle.InitializingLifecycleAwareProtocolHandler;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.apache.james.container.spring.filesystem.ResourceLoaderFileSystem;
+import org.apache.james.filesystem.api.FileSystem;
+import org.apache.james.smtpserver.CoreCmdHandlerLoader;
+import org.apache.james.smtpserver.fastfail.ValidRcptHandler;
 
-public class GuiceProtocolHandlerLoader implements ProtocolHandlerLoader {
-
-    private final Injector injector;
-
-    public GuiceProtocolHandlerLoader(Injector injector) {
-        this.injector = injector;
-    }
+public class ProtocolHandlerModule extends AbstractModule {
 
     @Override
-    public ProtocolHandler load(String name, Configuration config) throws LoadingException {
-        try {
-            ProtocolHandler handler = (ProtocolHandler) injector.getInstance(Class.forName(name));
-            if (handler instanceof LifecycleAwareProtocolHandler) {
-                ((InitializingLifecycleAwareProtocolHandler) handler).init(config);
-            }
-            return handler;
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
+    protected void configure() {
+        ResourceLoaderFileSystem resourceLoaderFileSystem = new ResourceLoaderFileSystem();
+        bind(FileSystem.class).annotatedWith(Names.named("filesystem")).toInstance(resourceLoaderFileSystem);
+        bind(ValidRcptHandler.class).toProvider(ValidRcptHandler::new);
+        bind(CoreCmdHandlerLoader.class).toProvider(CoreCmdHandlerLoader::new);
+        bind(org.apache.james.pop3server.core.CoreCmdHandlerLoader.class).toProvider(org.apache.james.pop3server.core.CoreCmdHandlerLoader::new);
     }
+
 }

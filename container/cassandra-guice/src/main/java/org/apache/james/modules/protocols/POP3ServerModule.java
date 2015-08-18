@@ -34,10 +34,18 @@ public class POP3ServerModule extends AbstractModule {
     public static final int DEFAULT_POP3_PORT = 110;
     private static final Logger LOGGER = LoggerFactory.getLogger(POP3ServerModule.class);
 
+    private final ProtocolHandlerLoader protocolHandlerLoader;
+
+    public POP3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
+        this.protocolHandlerLoader = protocolHandlerLoader;
+    }
+
     @Override
     protected void configure() {
-        bind(POP3ServerMBean.class).toInstance(pop3Server());
-        bind(ProtocolHandlerLoader.class).annotatedWith(Names.named("protocolhandlerloader")).to(GuiceProtocolHandlerLoader.class);
+        bind(ProtocolHandlerLoader.class).annotatedWith(Names.named("protocolhandlerloader")).toInstance(protocolHandlerLoader);
+        bind(ProtocolHandlerLoader.class).toInstance(protocolHandlerLoader);
+        POP3Server pop3Server = pop3Server();
+        bind(POP3ServerMBean.class).toInstance(pop3Server);
     }
 
     private POP3Server pop3Server() {
@@ -50,6 +58,16 @@ public class POP3ServerModule extends AbstractModule {
             HierarchicalConfiguration configuration = new HierarchicalConfiguration();
             configuration.setProperty("bind", "0.0.0.0:" + pop3Port());
 
+            HierarchicalConfiguration.Node handler1 = new HierarchicalConfiguration.Node("handler");
+            handler1.addAttribute(new HierarchicalConfiguration.Node("class", "org.apache.james.pop3server.core.CoreCmdHandlerLoader"));
+
+            HierarchicalConfiguration.Node handlerChain = new HierarchicalConfiguration.Node("handlerchain");
+            handlerChain.addAttribute(new HierarchicalConfiguration.Node("enableJmx", "false"));
+            handlerChain.addChild(handler1);
+
+            configuration.getRoot().addChild(handlerChain);
+
+            pop3Server.setProtocolHandlerLoader(protocolHandlerLoader);
             pop3Server.configure(configuration);
             pop3Server.bind();
             return pop3Server;
