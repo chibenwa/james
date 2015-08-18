@@ -41,9 +41,7 @@ public class CassandraJamesServer {
         Injector parentInjector = Guice.createInjector(new CassandraMailboxModule(),
             cassandraSessionModule(),
             elasticSearchMailboxModule(),
-            new JpaUsersRepositoryModule(),
-            new JpaDomainListModule(),
-            new JpaRewriteTablesModule(),
+            new JpaDataServerModule(),
             new DNSServiceModule(),
             new ProtocolHandlerModule(),
             new ActiveMQQueueModule()
