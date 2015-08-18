@@ -15,9 +15,15 @@ public class JpaDataServerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(RecipientRewriteTable.class).toInstance(new JPARecipientRewriteTable());
+        createRrt();
         createDomainList();
         createUserRepository();
+    }
+
+    private void createRrt() {
+        RecipientRewriteTable recipientRewriteTable = new JPARecipientRewriteTable();
+        bind(RecipientRewriteTable.class).toInstance(recipientRewriteTable);
+        bind(RecipientRewriteTable.class).annotatedWith(Names.named("recipientrewritetable")).toInstance(recipientRewriteTable);
     }
 
     private void createDomainList() {
