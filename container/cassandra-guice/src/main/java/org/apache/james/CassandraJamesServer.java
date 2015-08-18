@@ -49,7 +49,8 @@ public class CassandraJamesServer {
         ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
         return parentInjector.createChildInjector(imapServerModule(),
             pop3ServerModule(loader),
-            smtpServerModule(loader)
+            smtpServerModule(loader),
+            lmtpServerModule()
         );
     }
 
@@ -82,6 +83,10 @@ public class CassandraJamesServer {
 
     protected SMTPServerModule smtpServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
         return new SMTPServerModule(protocolHandlerLoader);
+    }
+
+    protected LMTPServerModule lmtpServerModule() {
+        return new LMTPServerModule();
     }
 
 }

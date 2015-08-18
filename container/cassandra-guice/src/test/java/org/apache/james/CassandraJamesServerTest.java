@@ -29,10 +29,7 @@ import org.apache.james.mailbox.elasticsearch.*;
 import org.apache.james.mailbox.elasticsearch.utils.TestingClientProvider;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
-import org.apache.james.modules.protocols.IMAPServerModule;
-import org.apache.james.modules.protocols.POP3ServerModule;
-import org.apache.james.modules.protocols.ProtocolHandlerModule;
-import org.apache.james.modules.protocols.SMTPServerModule;
+import org.apache.james.modules.protocols.*;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.junit.After;
 import org.junit.Before;
@@ -49,6 +46,7 @@ public class CassandraJamesServerTest {
     private static final int IMAP_PORT = 1143; // You need to be root (superuser) to bind to ports under 1024.
     private static final int POP3_PORT = 1110; // You need to be root (superuser) to bind to ports under 1024.
     public static final int SMTP_PORT = 10025;
+    public static final int LMTP_PORT = 10024;
 
     private TestCassandraJamesServer server;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -113,6 +111,14 @@ public class CassandraJamesServerTest {
             return SMTP_PORT;
         }
     }
+
+    private class TestLMTPServerModule extends LMTPServerModule {
+
+        @Override
+        protected int lmtpPort() {
+            return LMTP_PORT;
+        }
+    }
     
     private class TestCassandraJamesServer extends CassandraJamesServer {
 
@@ -137,6 +143,11 @@ public class CassandraJamesServerTest {
         @Override
         protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
             return new TestPOP3ServerModule(protocolHandlerLoader);
+        }
+
+        @Override
+        protected LMTPServerModule lmtpServerModule() {
+            return new TestLMTPServerModule();
         }
 
         @Override
@@ -179,6 +190,11 @@ public class CassandraJamesServerTest {
         SMTPTransport().connect();
     }
 
+    @Test
+    public void connectLMTPServerShouldNotThrowWhenNoCredentials() throws Exception {
+        LMTPTransport().connect();
+    }
+
     private Store IMAPstore() throws NoSuchProviderException {
         Properties properties = new Properties();
         properties.put("mail.imap.host", "localhost");
@@ -204,5 +220,14 @@ public class CassandraJamesServerTest {
         Session session = Session.getDefaultInstance(properties);
         session.setDebug(true);
         return session.getTransport("smtp");
+    }
+
+    private Transport LMTPTransport() throws NoSuchProviderException {
+        Properties properties = new Properties();
+        properties.put("mail.lmtp.host", "localhost");
+        properties.put("mail.lmtp.port", String.valueOf(LMTP_PORT));
+        Session session = Session.getDefaultInstance(properties);
+        session.setDebug(true);
+        return session.getTransport("lmtp");
     }
 }

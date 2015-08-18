@@ -35,6 +35,7 @@ public class ProtocolHandlerModule extends AbstractModule {
         bind(ValidRcptHandler.class).toProvider(ValidRcptHandler::new);
         bind(CoreCmdHandlerLoader.class).toProvider(CoreCmdHandlerLoader::new);
         bind(org.apache.james.pop3server.core.CoreCmdHandlerLoader.class).toProvider(org.apache.james.pop3server.core.CoreCmdHandlerLoader::new);
+        bind(org.apache.james.lmtpserver.CoreCmdHandlerLoader.class).toProvider(org.apache.james.lmtpserver.CoreCmdHandlerLoader::new);
     }
 
 }
