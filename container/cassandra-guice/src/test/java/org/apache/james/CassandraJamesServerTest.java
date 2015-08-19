@@ -22,7 +22,6 @@ import java.util.Properties;
 
 import javax.mail.*;
 
-import com.google.inject.Guice;
 import org.apache.james.mailbox.cassandra.CassandraClusterSingleton;
 import org.apache.james.mailbox.cassandra.ClusterProvider;
 import org.apache.james.mailbox.elasticsearch.*;
@@ -190,7 +189,7 @@ public class CassandraJamesServerTest {
         SMTPTransport().connect();
     }
 
-    @Test
+    @Test(expected = MessagingException.class)
     public void connectLMTPServerShouldNotThrowWhenNoCredentials() throws Exception {
         LMTPTransport().connect();
     }
@@ -224,10 +223,10 @@ public class CassandraJamesServerTest {
 
     private Transport LMTPTransport() throws NoSuchProviderException {
         Properties properties = new Properties();
-        properties.put("mail.lmtp.host", "localhost");
-        properties.put("mail.lmtp.port", String.valueOf(LMTP_PORT));
+        properties.put("mail.smtp.host", "localhost");
+        properties.put("mail.smtp.port", String.valueOf(LMTP_PORT));
         Session session = Session.getDefaultInstance(properties);
         session.setDebug(true);
-        return session.getTransport("lmtp");
+        return session.getTransport("smtp");
     }
 }
