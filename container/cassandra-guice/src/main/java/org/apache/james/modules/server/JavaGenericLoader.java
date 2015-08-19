@@ -19,16 +19,24 @@
 
 package org.apache.james.modules.server;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-import org.apache.james.queue.api.MailQueueFactory;
+import org.apache.mailet.MailetException;
 
-public class ActiveMQQueueModule extends AbstractModule {
+public class JavaGenericLoader<T> {
 
-    @Override
-    protected void configure() {
-        bind(MailQueueFactory.class).annotatedWith(Names.named("mailqueuefactory")).toProvider(ActiveMQProvider.class);
-        bind(MailQueueFactory.class).toProvider(ActiveMQProvider.class);
+    public T load(String name, String standardPackage) throws MailetException {
+        try {
+            Class<T> c = (Class<T>) ClassLoader.getSystemClassLoader().loadClass(constructFullName(name, standardPackage));
+            return  c.newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            throw new MailetException("Could not load mailet (" + name + ")", e);
+        }
+    }
+
+    private String constructFullName(String name, String standardPackage) {
+        if (name.indexOf(".") < 1) {
+            return standardPackage + "." + name;
+        }
+        return name;
     }
 
 }

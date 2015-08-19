@@ -21,14 +21,23 @@ package org.apache.james.modules.server;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import org.apache.james.queue.api.MailQueueFactory;
+import org.apache.james.mailetcontainer.api.MailProcessor;
+import org.apache.james.mailetcontainer.api.MailetLoader;
+import org.apache.james.mailetcontainer.api.MatcherLoader;
+import org.apache.james.mailetcontainer.api.jmx.MailSpoolerMBean;
+import org.apache.james.mailetcontainer.impl.JamesMailSpooler;
+import org.apache.james.mailetcontainer.impl.JamesMailetContext;
+import org.apache.james.mailetcontainer.impl.camel.CamelCompositeProcessor;
+import org.apache.mailet.MailetContext;
 
-public class ActiveMQQueueModule extends AbstractModule {
+public class CamelMailetContainerModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(MailQueueFactory.class).annotatedWith(Names.named("mailqueuefactory")).toProvider(ActiveMQProvider.class);
-        bind(MailQueueFactory.class).toProvider(ActiveMQProvider.class);
+        bind(MailProcessor.class).to(CamelCompositeProcessor.class);
+        bind(MailetContext.class).to(JamesMailetContext.class);
+        bind(MailSpoolerMBean.class).to(JamesMailSpooler.class);
+        bind(MailetLoader.class).annotatedWith(Names.named("mailetloader")).to(JavaMailetLoader.class);
+        bind(MatcherLoader.class).annotatedWith(Names.named("matcherloader")).to(JavaMatcherLoader.class);
     }
-
 }

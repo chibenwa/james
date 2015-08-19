@@ -44,7 +44,8 @@ public class CassandraJamesServer {
             new JpaDataServerModule(),
             new DNSServiceModule(),
             new ProtocolHandlerModule(),
-            new ActiveMQQueueModule()
+            new ActiveMQQueueModule(),
+            new CamelMailetContainerModule()
         );
         ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
         return parentInjector.createChildInjector(imapServerModule(),

@@ -19,16 +19,25 @@
 
 package org.apache.james.modules.server;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.name.Names;
-import org.apache.james.queue.api.MailQueueFactory;
+import org.apache.james.mailetcontainer.api.MatcherLoader;
+import org.apache.mailet.Matcher;
+import org.apache.mailet.MatcherConfig;
 
-public class ActiveMQQueueModule extends AbstractModule {
+import javax.mail.MessagingException;
 
-    @Override
-    protected void configure() {
-        bind(MailQueueFactory.class).annotatedWith(Names.named("mailqueuefactory")).toProvider(ActiveMQProvider.class);
-        bind(MailQueueFactory.class).toProvider(ActiveMQProvider.class);
+public class JavaMatcherLoader implements MatcherLoader {
+
+    private final JavaGenericLoader<Matcher> genericLoader;
+
+    public JavaMatcherLoader() {
+        genericLoader = new JavaGenericLoader<>();
     }
 
+    @Override
+    public Matcher getMatcher(MatcherConfig config) throws MessagingException {
+        String mailetName = config.getMatcherName();
+        final Matcher matcher = genericLoader.load(mailetName, "org.apache.james.transport.mailets");
+        matcher.init(config);
+        return matcher;
+    }
 }
