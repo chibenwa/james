@@ -29,7 +29,6 @@ import org.apache.james.mailbox.elasticsearch.utils.TestingClientProvider;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
 import org.apache.james.modules.protocols.*;
-import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,18 +79,6 @@ public class CassandraJamesServerTest {
         }
     }
 
-    private class TestSMTPServerModule extends SMTPServerModule {
-
-        public TestSMTPServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
-            super(protocolHandlerLoader);
-        }
-
-        @Override
-        protected int smtpPort() {
-            return SMTP_PORT;
-        }
-    }
-
     private class TestLMTPServerModule extends LMTPServerModule {
 
         @Override
@@ -125,10 +112,6 @@ public class CassandraJamesServerTest {
             return new TestElasticSearchMailboxModule(clientProvider);
         }
 
-        @Override
-        protected SMTPServerModule smtpServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
-            return new TestSMTPServerModule(protocolHandlerLoader);
-        }
     }
 
     @Before
