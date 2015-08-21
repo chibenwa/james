@@ -164,7 +164,12 @@ public class CassandraJamesServerTest {
 
     @Test (expected = AuthenticationFailedException.class)
     public void connectIMAPServerShouldThrowWhenNoCredentials() throws Exception {
-        IMAPstore().connect();
+        IMAPstore(IMAP_PORT).connect();
+    }
+
+    @Test (expected = AuthenticationFailedException.class)
+    public void connectOnSecondaryIMAPServerIMAPServerShouldThrowWhenNoCredentials() throws Exception {
+        IMAPstore(IMAP_PORT_SSL).connect();
     }
 
     @Test (expected = AuthenticationFailedException.class)
@@ -182,10 +187,10 @@ public class CassandraJamesServerTest {
         LMTPTransport().connect();
     }
 
-    private Store IMAPstore() throws NoSuchProviderException {
+    private Store IMAPstore(int port) throws NoSuchProviderException {
         Properties properties = new Properties();
         properties.put("mail.imap.host", "localhost");
-        properties.put("mail.imap.port", String.valueOf(IMAP_PORT));
+        properties.put("mail.imap.port", String.valueOf(port));
         Session session = Session.getDefaultInstance(properties);
         session.setDebug(true);
         return session.getStore("imap");
