@@ -20,8 +20,10 @@ package org.apache.james;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Injector;
+import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.james.imapserver.netty.IMAPServerFactory;
 import org.apache.james.lmtpserver.netty.LMTPServerFactory;
+import org.apache.james.mailetcontainer.impl.camel.CamelCompositeProcessor;
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
@@ -32,8 +34,12 @@ import com.google.inject.Guice;
 import org.apache.james.pop3server.netty.POP3ServerFactory;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.apache.james.smtpserver.netty.SMTPServerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CassandraJamesServer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CassandraJamesServer.class);
 
     private final ClassPathConfigurationProvider classPathConfigurationProvider;
 
@@ -53,11 +59,14 @@ public class CassandraJamesServer {
             new JpaDataServerModule(),
             new DNSServiceModule(),
             new ProtocolHandlerModule(),
+            new MailStoreRepositoryModule(),
             new ActiveMQQueueModule(),
-            new CamelMailetContainerModule()
+            new SieveModule()
         );
         ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
-        return parentInjector.createChildInjector(new IMAPServerModule(),
+        return parentInjector.createChildInjector(
+            new CamelMailetContainerModule(parentInjector),
+            new IMAPServerModule(),
             new POP3ServerModule(loader),
             new SMTPServerModule(),
             new LMTPServerModule()
@@ -66,6 +75,7 @@ public class CassandraJamesServer {
 
     private void postInit(Injector injector) {
         try {
+            initCamelProcessor(injector);
             initIMAPServers(injector);
             initPOP3Servers(injector);
             initSMTPServers(injector);
@@ -73,6 +83,14 @@ public class CassandraJamesServer {
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    private void initCamelProcessor(Injector injector) throws Exception {
+        CamelCompositeProcessor compositeProcessor = injector.getInstance(CamelCompositeProcessor.class);
+        compositeProcessor.setCamelContext(new DefaultCamelContext());
+        compositeProcessor.setLog(LOGGER);
+        compositeProcessor.configure(classPathConfigurationProvider.getConfiguration("mailetcontainer").configurationAt("processors"));
+        compositeProcessor.init();
     }
 
     private void initPOP3Servers(Injector injector) throws Exception {

@@ -19,26 +19,21 @@
 
 package org.apache.james.modules.server;
 
-import com.google.inject.Injector;
-import org.apache.james.mailetcontainer.api.MatcherLoader;
-import org.apache.mailet.Matcher;
-import org.apache.mailet.MatcherConfig;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.apache.james.filesystem.api.SieveFileRepository;
+import org.apache.james.managesieve.api.SieveParser;
+import org.apache.james.managesieve.api.SieveRepository;
+import org.apache.james.managesieve.jsieve.Parser;
 
-import javax.mail.MessagingException;
-
-public class JavaMatcherLoader implements MatcherLoader {
-
-    private final JavaGenericLoader<Matcher> genericLoader;
-
-    public JavaMatcherLoader(Injector injector) {
-        this.genericLoader = new JavaGenericLoader<>(injector,  "org.apache.james.transport.matchers");
-    }
+public class SieveModule extends AbstractModule {
 
     @Override
-    public Matcher getMatcher(MatcherConfig config) throws MessagingException {
-        String mailetName = config.getMatcherName();
-        final Matcher matcher = genericLoader.load(mailetName);
-        matcher.init(config);
-        return matcher;
+    protected void configure() {
+        Parser parser = new Parser();
+        bind(SieveParser.class).annotatedWith(Names.named("sieveparser")).toInstance(parser);
+        bind(SieveParser.class).toInstance(parser);
+        bind(SieveRepository.class).to(SieveFileRepository.class);
     }
+
 }

@@ -42,6 +42,7 @@ public class ActiveMQProvider implements Provider<JMSMailQueueFactory> {
 
     private JMSMailQueueFactory createActiveMailQueueFactory(ActiveMQConnectionFactory connectionFactory) {
         ActiveMQMailQueueFactory result = new ActiveMQMailQueueFactory();
+        result.setUseJMX(false);
         result.setConnectionFactory(connectionFactory);
         return result;
     }

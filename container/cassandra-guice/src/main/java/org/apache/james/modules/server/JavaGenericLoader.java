@@ -19,16 +19,26 @@
 
 package org.apache.james.modules.server;
 
+import com.google.common.base.Throwables;
+import com.google.inject.Injector;
 import org.apache.mailet.MailetException;
 
 public class JavaGenericLoader<T> {
 
-    public T load(String name, String standardPackage) throws MailetException {
+    private final Injector injector;
+    private final String standardPackage;
+
+    public JavaGenericLoader(Injector injector, String standardPackage) {
+        this.injector = injector;
+        this.standardPackage = standardPackage;
+    }
+
+    public T load(String name) throws MailetException {
         try {
             Class<T> c = (Class<T>) ClassLoader.getSystemClassLoader().loadClass(constructFullName(name, standardPackage));
-            return  c.newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            throw new MailetException("Could not load mailet (" + name + ")", e);
+            return  injector.getInstance(c);
+        } catch (ClassNotFoundException e) {
+            throw Throwables.propagate(e);
         }
     }
 

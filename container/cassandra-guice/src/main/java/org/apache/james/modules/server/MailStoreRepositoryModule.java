@@ -19,26 +19,23 @@
 
 package org.apache.james.modules.server;
 
-import com.google.inject.Injector;
-import org.apache.james.mailetcontainer.api.MatcherLoader;
-import org.apache.mailet.Matcher;
-import org.apache.mailet.MatcherConfig;
+import com.google.common.base.Throwables;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import org.apache.james.mailrepository.api.MailRepositoryStore;
 
-import javax.mail.MessagingException;
-
-public class JavaMatcherLoader implements MatcherLoader {
-
-    private final JavaGenericLoader<Matcher> genericLoader;
-
-    public JavaMatcherLoader(Injector injector) {
-        this.genericLoader = new JavaGenericLoader<>(injector,  "org.apache.james.transport.matchers");
-    }
+public class MailStoreRepositoryModule extends AbstractModule {
 
     @Override
-    public Matcher getMatcher(MatcherConfig config) throws MessagingException {
-        String mailetName = config.getMatcherName();
-        final Matcher matcher = genericLoader.load(mailetName);
-        matcher.init(config);
-        return matcher;
+    protected void configure() {
+        JavaMailRepositoryStore javaMailRepositoryStore = new JavaMailRepositoryStore();
+        try {
+            javaMailRepositoryStore.configure(new ClassPathConfigurationProvider().getConfiguration("mailrepositorystore"));
+            javaMailRepositoryStore.init();
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+        bind(MailRepositoryStore.class).toInstance(javaMailRepositoryStore);
+        bind(MailRepositoryStore.class).annotatedWith(Names.named("mailrepositorystore")).toInstance(javaMailRepositoryStore);
     }
 }

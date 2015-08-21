@@ -20,6 +20,7 @@
 package org.apache.james.modules.server;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.name.Names;
 import org.apache.james.mailetcontainer.api.MailProcessor;
 import org.apache.james.mailetcontainer.api.MailetLoader;
@@ -29,15 +30,27 @@ import org.apache.james.mailetcontainer.impl.JamesMailSpooler;
 import org.apache.james.mailetcontainer.impl.JamesMailetContext;
 import org.apache.james.mailetcontainer.impl.camel.CamelCompositeProcessor;
 import org.apache.mailet.MailetContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CamelMailetContainerModule extends AbstractModule {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(CamelMailetContainerModule.class);
+
+    private final Injector injector;
+
+    public CamelMailetContainerModule(Injector injector) {
+        this.injector = injector;
+    }
 
     @Override
     protected void configure() {
         bind(MailProcessor.class).to(CamelCompositeProcessor.class);
-        bind(MailetContext.class).to(JamesMailetContext.class);
+        JamesMailetContext jamesMailetContext = new JamesMailetContext();
+        jamesMailetContext.setLog(LOGGER);
+        bind(MailetContext.class).toInstance(jamesMailetContext);
         bind(MailSpoolerMBean.class).to(JamesMailSpooler.class);
-        bind(MailetLoader.class).annotatedWith(Names.named("mailetloader")).to(JavaMailetLoader.class);
-        bind(MatcherLoader.class).annotatedWith(Names.named("matcherloader")).to(JavaMatcherLoader.class);
+        bind(MailetLoader.class).annotatedWith(Names.named("mailetloader")).toInstance(new JavaMailetLoader(injector));
+        bind(MatcherLoader.class).annotatedWith(Names.named("matcherloader")).toInstance(new JavaMatcherLoader(injector));
     }
 }

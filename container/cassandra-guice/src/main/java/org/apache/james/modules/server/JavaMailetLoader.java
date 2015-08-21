@@ -19,6 +19,7 @@
 
 package org.apache.james.modules.server;
 
+import com.google.inject.Injector;
 import org.apache.james.mailetcontainer.api.MailetLoader;
 import org.apache.mailet.Mailet;
 import org.apache.mailet.MailetConfig;
@@ -29,14 +30,14 @@ public class JavaMailetLoader implements MailetLoader {
 
     private final JavaGenericLoader<Mailet> genericLoader;
 
-    public JavaMailetLoader() {
-        genericLoader = new JavaGenericLoader<>();
+    public JavaMailetLoader(Injector injector) {
+        this.genericLoader = new JavaGenericLoader<>(injector,  "org.apache.james.transport.mailets");
     }
 
     @Override
     public Mailet getMailet(MailetConfig config) throws MessagingException {
         String mailetName = config.getMailetName();
-        final Mailet mailet = genericLoader.load(mailetName, "org.apache.james.transport.mailets");
+        final Mailet mailet = genericLoader.load(mailetName);
         mailet.init(config);
         return mailet;
     }
