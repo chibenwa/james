@@ -56,13 +56,9 @@ public class IMAPServerModule extends AbstractModule {
     }
 
     private IMAPServerFactory imapServerFactory() {
-        try {
-            IMAPServerFactory imapServerFactory = new IMAPServerFactory();
-            imapServerFactory.setLog(LOGGER);
-            return imapServerFactory;
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
+        IMAPServerFactory imapServerFactory = new IMAPServerFactory();
+        imapServerFactory.setLog(LOGGER);
+        return imapServerFactory;
     }
 
     private static class DefaultImapProcessorProvider implements Provider<ImapProcessor> {
