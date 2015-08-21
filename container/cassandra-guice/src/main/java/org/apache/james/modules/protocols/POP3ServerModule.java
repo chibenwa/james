@@ -19,13 +19,9 @@
 
 package org.apache.james.modules.protocols;
 
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.james.pop3server.netty.POP3Server;
 import org.apache.james.pop3server.netty.POP3ServerFactory;
-import org.apache.james.pop3server.netty.POP3ServerMBean;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +44,9 @@ public class POP3ServerModule extends AbstractModule {
     }
 
     private POP3ServerFactory pop3ServerFactory() {
-        try {
-            POP3ServerFactory pop3ServerFactory = new POP3ServerFactory();
-            pop3ServerFactory.setLog(LOGGER);
-            return pop3ServerFactory;
-        } catch(Exception exception) {
-            throw Throwables.propagate(exception);
-        }
+        POP3ServerFactory pop3ServerFactory = new POP3ServerFactory();
+        pop3ServerFactory.setLog(LOGGER);
+        return pop3ServerFactory;
     }
 
 }
