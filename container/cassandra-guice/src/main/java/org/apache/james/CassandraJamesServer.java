@@ -77,25 +77,25 @@ public class CassandraJamesServer {
 
     private void initPOP3Servers(Injector injector) throws Exception {
         POP3ServerFactory pop3ServerFactory = injector.getInstance(POP3ServerFactory.class);
-        pop3ServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("pop3server"));
+        pop3ServerFactory.configure(classPathConfigurationProvider.getConfiguration("pop3server"));
         pop3ServerFactory.init();
     }
 
     private void initIMAPServers(Injector injector) throws Exception {
         IMAPServerFactory imapServerFactory = injector.getInstance(IMAPServerFactory.class);
-        imapServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("imapserver"));
+        imapServerFactory.configure(classPathConfigurationProvider.getConfiguration("imapserver"));
         imapServerFactory.init();
     }
 
     private void initSMTPServers(Injector injector) throws Exception {
         SMTPServerFactory smtpServerFactory = injector.getInstance(SMTPServerFactory.class);
-        smtpServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("smtpserver"));
+        smtpServerFactory.configure(classPathConfigurationProvider.getConfiguration("smtpserver"));
         smtpServerFactory.init();
     }
 
     private void initLMTPServers(Injector injector) throws Exception {
         LMTPServerFactory lmtpServerFactory = injector.getInstance(LMTPServerFactory.class);
-        lmtpServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("lmtpserver"));
+        lmtpServerFactory.configure(classPathConfigurationProvider.getConfiguration("lmtpserver"));
         lmtpServerFactory.init();
     }
 
