@@ -43,7 +43,8 @@ public class CassandraJamesServerTest {
 
     private static final CassandraClusterSingleton CASSANDRA = CassandraClusterSingleton.build();
     private static final int IMAP_PORT = 1143; // You need to be root (superuser) to bind to ports under 1024.
-    private static final int POP3_PORT = 1110; // You need to be root (superuser) to bind to ports under 1024.
+    private static final int IMAP_PORT_SSL = 1993;
+    private static final int POP3_PORT = 1110;
     public static final int SMTP_PORT = 10025;
     public static final int LMTP_PORT = 10024;
 
@@ -76,14 +77,6 @@ public class CassandraJamesServerTest {
         @Override
         protected void bindClientProvider() {
             bind(ClientProvider.class).toInstance(clientProvider);
-        }
-    }
-    
-    private class TestIMAPServerModule extends IMAPServerModule {
-
-        @Override
-        protected int imapPort() {
-            return IMAP_PORT;
         }
     }
 
@@ -132,11 +125,6 @@ public class CassandraJamesServerTest {
         @Override
         protected CassandraSessionModule cassandraSessionModule() {
             return new TestCassandraSessionModule();
-        }
-
-        @Override
-        protected IMAPServerModule imapServerModule() {
-            return new TestIMAPServerModule();
         }
 
         @Override

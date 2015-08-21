@@ -18,19 +18,15 @@
  ****************************************************************/
 package org.apache.james.modules.protocols;
 
-import java.net.InetSocketAddress;
-
 import javax.inject.Inject;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.james.imap.api.process.ImapProcessor;
 import org.apache.james.imap.decode.ImapDecoder;
 import org.apache.james.imap.encode.ImapEncoder;
 import org.apache.james.imap.encode.main.DefaultImapEncoderFactory;
 import org.apache.james.imap.main.DefaultImapDecoderFactory;
 import org.apache.james.imap.processor.main.DefaultImapProcessorFactory;
-import org.apache.james.imapserver.netty.IMAPServer;
-import org.apache.james.imapserver.netty.IMAPServerMBean;
+import org.apache.james.imapserver.netty.IMAPServerFactory;
 import org.apache.james.mailbox.MailboxManager;
 import org.apache.james.mailbox.SubscriptionManager;
 import org.slf4j.Logger;
@@ -44,12 +40,11 @@ import com.google.inject.name.Names;
 
 public class IMAPServerModule extends AbstractModule {
 
-    public static final int DEFAULT_IMAP_PORT = 143;
     private static final Logger LOGGER = LoggerFactory.getLogger(IMAPServerModule.class);
 
     @Override
     protected void configure() {
-        bind(IMAPServerMBean.class).toInstance(imapServer());
+        bind(IMAPServerFactory.class).toInstance(imapServerFactory());
 
         bind(ImapProcessor.class).annotatedWith(Names.named("imapProcessor")).toProvider(DefaultImapProcessorProvider.class);
 
@@ -60,20 +55,11 @@ public class IMAPServerModule extends AbstractModule {
         bind(ImapEncoder.class).annotatedWith(Names.named("imapEncoder")).toInstance(defaultImapEncoderFactory.buildImapEncoder());
     }
 
-    protected int imapPort() {
-        return DEFAULT_IMAP_PORT;
-    }
-
-    private IMAPServer imapServer() {
+    private IMAPServerFactory imapServerFactory() {
         try {
-            IMAPServer imapServer = new IMAPServer();
-            imapServer.setListenAddresses(new InetSocketAddress("0.0.0.0", imapPort()));
-            imapServer.setBacklog(200);
-
-            imapServer.doConfigure(new HierarchicalConfiguration());
-            imapServer.setLog(LOGGER);
-            imapServer.bind();
-            return imapServer;
+            IMAPServerFactory imapServerFactory = new IMAPServerFactory();
+            imapServerFactory.setLog(LOGGER);
+            return imapServerFactory;
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
@@ -94,6 +80,6 @@ public class IMAPServerModule extends AbstractModule {
         public ImapProcessor get() {
             return DefaultImapProcessorFactory.createXListSupportingProcessor(mailboxManager, subscriptionManager, null, 120, ImmutableSet.of("ACL", "MOVE"));
         }
-        
+
     }
 }

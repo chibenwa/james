@@ -20,6 +20,9 @@ package org.apache.james;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Injector;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.james.imapserver.netty.IMAPServer;
+import org.apache.james.imapserver.netty.IMAPServerFactory;
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
@@ -29,8 +32,16 @@ import org.apache.james.modules.server.*;
 import com.google.inject.Guice;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.apache.james.smtpserver.netty.SMTPServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CassandraJamesServer {
+
+    private final ClassPathConfigurationProvider classPathConfigurationProvider;
+
+    public CassandraJamesServer() {
+        this.classPathConfigurationProvider = new ClassPathConfigurationProvider();
+    }
 
     public void start() {
         Injector injector = resolveInjections();
@@ -48,7 +59,7 @@ public class CassandraJamesServer {
             new CamelMailetContainerModule()
         );
         ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
-        return parentInjector.createChildInjector(imapServerModule(),
+        return parentInjector.createChildInjector(new IMAPServerModule(),
             pop3ServerModule(loader),
             smtpServerModule(loader),
             lmtpServerModule()
@@ -61,6 +72,17 @@ public class CassandraJamesServer {
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+        try {
+            initIMAPServers(injector);
+        } catch (Exception e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
+    private void initIMAPServers(Injector injector) throws Exception {
+        IMAPServerFactory imapServerFactory = injector.getInstance(IMAPServerFactory.class);
+        imapServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("imapserver"));
+        imapServerFactory.init();
     }
 
     public void stop() {
@@ -72,10 +94,6 @@ public class CassandraJamesServer {
 
     protected ElasticSearchMailboxModule elasticSearchMailboxModule() {
         return new ElasticSearchMailboxModule();
-    }
-
-    protected IMAPServerModule imapServerModule() {
-        return new IMAPServerModule();
     }
 
     protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
