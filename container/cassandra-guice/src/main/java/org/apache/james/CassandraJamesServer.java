@@ -20,9 +20,8 @@ package org.apache.james;
 
 import com.google.common.base.Throwables;
 import com.google.inject.Injector;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.james.imapserver.netty.IMAPServer;
 import org.apache.james.imapserver.netty.IMAPServerFactory;
+import org.apache.james.lmtpserver.netty.LMTPServerFactory;
 import org.apache.james.modules.mailbox.CassandraMailboxModule;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
@@ -32,10 +31,7 @@ import org.apache.james.modules.server.*;
 import com.google.inject.Guice;
 import org.apache.james.pop3server.netty.POP3ServerFactory;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
-import org.apache.james.smtpserver.netty.SMTPServer;
 import org.apache.james.smtpserver.netty.SMTPServerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CassandraJamesServer {
 
@@ -64,7 +60,7 @@ public class CassandraJamesServer {
         return parentInjector.createChildInjector(new IMAPServerModule(),
             new POP3ServerModule(loader),
             new SMTPServerModule(),
-            lmtpServerModule()
+            new LMTPServerModule()
         );
     }
 
@@ -73,6 +69,7 @@ public class CassandraJamesServer {
             initIMAPServers(injector);
             initPOP3Servers(injector);
             initSMTPServers(injector);
+            initLMTPServers(injector);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
@@ -96,6 +93,12 @@ public class CassandraJamesServer {
         smtpServerFactory.init();
     }
 
+    private void initLMTPServers(Injector injector) throws Exception {
+        LMTPServerFactory lmtpServerFactory = injector.getInstance(LMTPServerFactory.class);
+        lmtpServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("lmtpserver"));
+        lmtpServerFactory.init();
+    }
+
     public void stop() {
     }
 
@@ -105,10 +108,6 @@ public class CassandraJamesServer {
 
     protected ElasticSearchMailboxModule elasticSearchMailboxModule() {
         return new ElasticSearchMailboxModule();
-    }
-
-    protected LMTPServerModule lmtpServerModule() {
-        return new LMTPServerModule();
     }
 
 }

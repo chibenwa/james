@@ -19,56 +19,24 @@
 
 package org.apache.james.modules.protocols;
 
-import com.google.common.base.Throwables;
 import com.google.inject.AbstractModule;
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.james.lmtpserver.netty.LMTPServer;
-import org.apache.james.lmtpserver.netty.LMTPServerMBean;
+import org.apache.james.lmtpserver.netty.LMTPServerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.InetSocketAddress;
 
 public class LMTPServerModule extends AbstractModule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LMTPServerModule.class);
-    public static final int LMTP_DEFAULT_PORT = 24;
 
     @Override
     protected void configure() {
-        bind(LMTPServerMBean.class).toInstance(lmtpServer());
+        bind(LMTPServerFactory.class).toInstance(lmtpServerFactory());
     }
 
-    private LMTPServer lmtpServer() {
-        try {
-            LMTPServer lmtpServer = new LMTPServer();
-            lmtpServer.setListenAddresses(new InetSocketAddress("0.0.0.0", lmtpPort()));
-            lmtpServer.setBacklog(200);
-            lmtpServer.setLog(LOGGER);
-            lmtpServer.configure(createHierarchicalConfiguration());
-            lmtpServer.bind();
-            return lmtpServer;
-        } catch (Exception e) {
-            throw Throwables.propagate(e);
-        }
+    private LMTPServerFactory lmtpServerFactory() {
+        LMTPServerFactory lmtpServerFactory = new LMTPServerFactory();
+        lmtpServerFactory.setLog(LOGGER);
+        return lmtpServerFactory;
     }
 
-    private HierarchicalConfiguration createHierarchicalConfiguration() {
-        HierarchicalConfiguration configuration = new HierarchicalConfiguration();
-        configuration.setProperty("bind", "0.0.0.0:" + lmtpPort());
-
-        HierarchicalConfiguration.Node handler1 = new HierarchicalConfiguration.Node("handler");
-        handler1.addAttribute(new HierarchicalConfiguration.Node("class", "org.apache.james.lmtpserver.CoreCmdHandlerLoader"));
-
-        HierarchicalConfiguration.Node handlerChain = new HierarchicalConfiguration.Node("handlerchain");
-        handlerChain.addAttribute(new HierarchicalConfiguration.Node("enableJmx", "false"));
-        handlerChain.addChild(handler1);
-
-        configuration.getRoot().addChild(handlerChain);
-        return configuration;
-    }
-
-    protected int lmtpPort() {
-        return LMTP_DEFAULT_PORT;
-    }
 }

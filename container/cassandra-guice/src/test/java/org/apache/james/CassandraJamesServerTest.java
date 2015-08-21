@@ -28,7 +28,6 @@ import org.apache.james.mailbox.elasticsearch.*;
 import org.apache.james.mailbox.elasticsearch.utils.TestingClientProvider;
 import org.apache.james.modules.mailbox.CassandraSessionModule;
 import org.apache.james.modules.mailbox.ElasticSearchMailboxModule;
-import org.apache.james.modules.protocols.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,14 +77,6 @@ public class CassandraJamesServerTest {
             bind(ClientProvider.class).toInstance(clientProvider);
         }
     }
-
-    private class TestLMTPServerModule extends LMTPServerModule {
-
-        @Override
-        protected int lmtpPort() {
-            return LMTP_PORT;
-        }
-    }
     
     private class TestCassandraJamesServer extends CassandraJamesServer {
 
@@ -100,11 +91,6 @@ public class CassandraJamesServerTest {
         @Override
         protected CassandraSessionModule cassandraSessionModule() {
             return new TestCassandraSessionModule();
-        }
-
-        @Override
-        protected LMTPServerModule lmtpServerModule() {
-            return new TestLMTPServerModule();
         }
 
         @Override
