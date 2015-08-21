@@ -32,6 +32,7 @@ public class ProtocolHandlerModule extends AbstractModule {
     protected void configure() {
         ResourceLoaderFileSystem resourceLoaderFileSystem = new ResourceLoaderFileSystem();
         bind(FileSystem.class).annotatedWith(Names.named("filesystem")).toInstance(resourceLoaderFileSystem);
+        bind(FileSystem.class).toInstance(resourceLoaderFileSystem);
         bind(ValidRcptHandler.class).toProvider(ValidRcptHandler::new);
         bind(CoreCmdHandlerLoader.class).toProvider(CoreCmdHandlerLoader::new);
         bind(org.apache.james.pop3server.core.CoreCmdHandlerLoader.class).toProvider(org.apache.james.pop3server.core.CoreCmdHandlerLoader::new);

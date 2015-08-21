@@ -80,18 +80,6 @@ public class CassandraJamesServerTest {
         }
     }
 
-    private class TestPOP3ServerModule extends POP3ServerModule {
-
-        public TestPOP3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
-            super(protocolHandlerLoader);
-        }
-
-        @Override
-        protected int pop3Port() {
-            return POP3_PORT;
-        }
-    }
-
     private class TestSMTPServerModule extends SMTPServerModule {
 
         public TestSMTPServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
@@ -125,11 +113,6 @@ public class CassandraJamesServerTest {
         @Override
         protected CassandraSessionModule cassandraSessionModule() {
             return new TestCassandraSessionModule();
-        }
-
-        @Override
-        protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
-            return new TestPOP3ServerModule(protocolHandlerLoader);
         }
 
         @Override

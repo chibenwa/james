@@ -30,6 +30,7 @@ import org.apache.james.modules.protocols.*;
 import org.apache.james.modules.server.*;
 
 import com.google.inject.Guice;
+import org.apache.james.pop3server.netty.POP3ServerFactory;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.apache.james.smtpserver.netty.SMTPServer;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class CassandraJamesServer {
         );
         ProtocolHandlerLoader loader = new GuiceProtocolHandlerLoader(parentInjector);
         return parentInjector.createChildInjector(new IMAPServerModule(),
-            pop3ServerModule(loader),
+            new POP3ServerModule(loader),
             smtpServerModule(loader),
             lmtpServerModule()
         );
@@ -74,9 +75,16 @@ public class CassandraJamesServer {
         }
         try {
             initIMAPServers(injector);
+            initPOP3Servers(injector);
         } catch (Exception e) {
             throw Throwables.propagate(e);
         }
+    }
+
+    private void initPOP3Servers(Injector injector) throws Exception {
+        POP3ServerFactory pop3ServerFactory = injector.getInstance(POP3ServerFactory.class);
+        pop3ServerFactory.configure(new ClassPathConfigurationProvider().getConfiguration("pop3server"));
+        pop3ServerFactory.init();
     }
 
     private void initIMAPServers(Injector injector) throws Exception {
@@ -94,10 +102,6 @@ public class CassandraJamesServer {
 
     protected ElasticSearchMailboxModule elasticSearchMailboxModule() {
         return new ElasticSearchMailboxModule();
-    }
-
-    protected POP3ServerModule pop3ServerModule(ProtocolHandlerLoader protocolHandlerLoader) {
-        return new POP3ServerModule(protocolHandlerLoader);
     }
 
     protected SMTPServerModule smtpServerModule(ProtocolHandlerLoader protocolHandlerLoader) {

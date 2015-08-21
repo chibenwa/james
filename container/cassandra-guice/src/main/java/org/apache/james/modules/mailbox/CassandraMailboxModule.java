@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.james.modules.mailbox;
 
+import com.google.inject.name.Names;
 import org.apache.james.adapter.mailbox.store.UserRepositoryAuthenticator;
 import org.apache.james.mailbox.MailboxManager;
 import org.apache.james.mailbox.MailboxPathLocker;
@@ -44,6 +45,7 @@ public class CassandraMailboxModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(MailboxManager.class).to(CassandraMailboxManager.class);
+        bind(MailboxManager.class).annotatedWith(Names.named("mailboxmanager")).to(CassandraMailboxManager.class);
         bind(SubscriptionManager.class).to(CassandraSubscriptionManager.class);
         bind(new TypeLiteral<MessageMapperFactory<CassandraId>>(){}).to(new TypeLiteral<CassandraMailboxSessionMapperFactory>(){});
 

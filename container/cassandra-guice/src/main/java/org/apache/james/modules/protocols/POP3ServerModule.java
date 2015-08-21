@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.james.pop3server.netty.POP3Server;
+import org.apache.james.pop3server.netty.POP3ServerFactory;
 import org.apache.james.pop3server.netty.POP3ServerMBean;
 import org.apache.james.protocols.lib.handler.ProtocolHandlerLoader;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 public class POP3ServerModule extends AbstractModule {
 
-    public static final int DEFAULT_POP3_PORT = 110;
     private static final Logger LOGGER = LoggerFactory.getLogger(POP3ServerModule.class);
 
     private final ProtocolHandlerLoader protocolHandlerLoader;
@@ -44,41 +44,17 @@ public class POP3ServerModule extends AbstractModule {
     protected void configure() {
         bind(ProtocolHandlerLoader.class).annotatedWith(Names.named("protocolhandlerloader")).toInstance(protocolHandlerLoader);
         bind(ProtocolHandlerLoader.class).toInstance(protocolHandlerLoader);
-        POP3Server pop3Server = pop3Server();
-        bind(POP3ServerMBean.class).toInstance(pop3Server);
+        bind(POP3ServerFactory.class).toInstance(pop3ServerFactory());
     }
 
-    private POP3Server pop3Server() {
+    private POP3ServerFactory pop3ServerFactory() {
         try {
-            POP3Server pop3Server = new POP3Server();
-            pop3Server.setBacklog(200);
-            pop3Server.setLog(LOGGER);
-            pop3Server.setProtocolHandlerLoader(protocolHandlerLoader);
-            pop3Server.configure(createHierarchicalConfiguration());
-            pop3Server.bind();
-            return pop3Server;
+            POP3ServerFactory pop3ServerFactory = new POP3ServerFactory();
+            pop3ServerFactory.setLog(LOGGER);
+            return pop3ServerFactory;
         } catch(Exception exception) {
             throw Throwables.propagate(exception);
         }
-    }
-
-    private HierarchicalConfiguration createHierarchicalConfiguration() {
-        HierarchicalConfiguration configuration = new HierarchicalConfiguration();
-        configuration.setProperty("bind", "0.0.0.0:" + pop3Port());
-
-        HierarchicalConfiguration.Node handler1 = new HierarchicalConfiguration.Node("handler");
-        handler1.addAttribute(new HierarchicalConfiguration.Node("class", "org.apache.james.pop3server.core.CoreCmdHandlerLoader"));
-
-        HierarchicalConfiguration.Node handlerChain = new HierarchicalConfiguration.Node("handlerchain");
-        handlerChain.addAttribute(new HierarchicalConfiguration.Node("enableJmx", "false"));
-        handlerChain.addChild(handler1);
-
-        configuration.getRoot().addChild(handlerChain);
-        return configuration;
-    }
-
-    protected int pop3Port() {
-        return DEFAULT_POP3_PORT;
     }
 
 }
