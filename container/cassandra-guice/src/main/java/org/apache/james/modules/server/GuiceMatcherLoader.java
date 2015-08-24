@@ -26,12 +26,12 @@ import org.apache.mailet.MatcherConfig;
 
 import javax.mail.MessagingException;
 
-public class JavaMatcherLoader implements MatcherLoader {
+public class GuiceMatcherLoader implements MatcherLoader {
 
-    private final JavaGenericLoader<Matcher> genericLoader;
+    private final GuiceGenericLoader<Matcher> genericLoader;
 
-    public JavaMatcherLoader(Injector injector) {
-        this.genericLoader = new JavaGenericLoader<>(injector,  "org.apache.james.transport.matchers");
+    public GuiceMatcherLoader(Injector injector) {
+        this.genericLoader = new GuiceGenericLoader<>(injector,  "org.apache.james.transport.matchers");
     }
 
     @Override

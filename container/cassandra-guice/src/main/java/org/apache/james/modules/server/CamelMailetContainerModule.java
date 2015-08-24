@@ -50,7 +50,7 @@ public class CamelMailetContainerModule extends AbstractModule {
         jamesMailetContext.setLog(LOGGER);
         bind(MailetContext.class).toInstance(jamesMailetContext);
         bind(MailSpoolerMBean.class).to(JamesMailSpooler.class);
-        bind(MailetLoader.class).annotatedWith(Names.named("mailetloader")).toInstance(new JavaMailetLoader(injector));
-        bind(MatcherLoader.class).annotatedWith(Names.named("matcherloader")).toInstance(new JavaMatcherLoader(injector));
+        bind(MailetLoader.class).annotatedWith(Names.named("mailetloader")).toInstance(new GuiceMailetLoader(injector));
+        bind(MatcherLoader.class).annotatedWith(Names.named("matcherloader")).toInstance(new GuiceMatcherLoader(injector));
     }
 }

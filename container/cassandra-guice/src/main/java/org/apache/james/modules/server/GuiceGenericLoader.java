@@ -23,12 +23,12 @@ import com.google.common.base.Throwables;
 import com.google.inject.Injector;
 import org.apache.mailet.MailetException;
 
-public class JavaGenericLoader<T> {
+public class GuiceGenericLoader<T> {
 
     private final Injector injector;
     private final String standardPackage;
 
-    public JavaGenericLoader(Injector injector, String standardPackage) {
+    public GuiceGenericLoader(Injector injector, String standardPackage) {
         this.injector = injector;
         this.standardPackage = standardPackage;
     }

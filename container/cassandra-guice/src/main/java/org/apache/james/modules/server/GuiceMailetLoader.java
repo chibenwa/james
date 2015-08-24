@@ -26,12 +26,12 @@ import org.apache.mailet.MailetConfig;
 
 import javax.mail.MessagingException;
 
-public class JavaMailetLoader implements MailetLoader {
+public class GuiceMailetLoader implements MailetLoader {
 
-    private final JavaGenericLoader<Mailet> genericLoader;
+    private final GuiceGenericLoader<Mailet> genericLoader;
 
-    public JavaMailetLoader(Injector injector) {
-        this.genericLoader = new JavaGenericLoader<>(injector,  "org.apache.james.transport.mailets");
+    public GuiceMailetLoader(Injector injector) {
+        this.genericLoader = new GuiceGenericLoader<>(injector,  "org.apache.james.transport.mailets");
     }
 
     @Override
