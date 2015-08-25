@@ -20,7 +20,7 @@ package org.apache.james.cli.probe.impl;
 
 import org.apache.james.adapter.mailbox.MailboxManagerManagementMBean;
 import org.apache.james.cli.probe.ServerProbe;
-import org.apache.james.container.spring.mailbox.MailboxCopierManagementMBean;
+import org.apache.james.adapter.mailbox.copier.MailboxCopierManagementMBean;
 import org.apache.james.domainlist.api.DomainListManagementMBean;
 import org.apache.james.rrt.api.RecipientRewriteTableManagementMBean;
 import org.apache.james.user.api.UsersRepositoryManagementMBean;
