@@ -82,6 +82,7 @@
         <module>data/data-file</module>
         <module>data/data-ldap</module>
         <module>data/data-hbase</module>
+        <module>data/data-hystrix</module>
 
         <module>protocols/fetchmail</module>
         <module>protocols/protocols-imap4</module>
@@ -1096,6 +1097,17 @@
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.netflix.hystrix</groupId>
+                <artifactId>hystrix-core</artifactId>
+                <version>1.4.14</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.rxjava</groupId>
+                <artifactId>rxjava-core</artifactId>
+                <version>0.20.7</version>
             </dependency>
 
             <!-- OSGI dependencies -->
