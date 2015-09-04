@@ -19,13 +19,9 @@
 
 package org.apache.james.modules.server;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.multibindings.Multibinder;
+import org.apache.james.adapter.mailbox.MailboxCopierManagementMBean;
 import org.apache.james.adapter.mailbox.MailboxManagerManagement;
 import org.apache.james.adapter.mailbox.MailboxManagerManagementMBean;
-import org.apache.james.container.spring.mailbox.MailboxCopierManagementMBean;
 import org.apache.james.domainlist.api.DomainListManagementMBean;
 import org.apache.james.domainlist.lib.DomainListManagement;
 import org.apache.james.mailbox.copier.MailboxCopier;
@@ -36,9 +32,13 @@ import org.apache.james.rrt.api.RecipientRewriteTableManagementMBean;
 import org.apache.james.rrt.lib.RecipientRewriteTableManagement;
 import org.apache.james.user.api.UsersRepositoryManagementMBean;
 import org.apache.james.user.lib.UsersRepositoryManagement;
-import org.apache.james.utils.ClassPathConfigurationProvider;
 import org.apache.james.utils.ConfigurationPerformer;
 import org.apache.james.utils.MailboxCopierManagement;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
 
 public class JMXServerModule extends AbstractModule {
 
