@@ -19,36 +19,39 @@
 
 package org.apache.james.utils;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.james.mailbox.MailboxManager;
-import org.apache.james.mailbox.copier.MailboxCopier;
 
-import java.util.Map;
+import com.google.common.base.Objects;
 
-public class MailboxCopierManagement implements MailboxCopierManagementMBean {
+public class MailboxManagerDefinition {
+    
+    private final String name;
+    private final MailboxManager manager;
 
-    private final Injector injector;
-    private final MailboxCopier mailboxCopier;
-
-    @Inject
-    public MailboxCopierManagement(Injector injector, MailboxCopier mailboxCopier) {
-        this.injector = injector;
-        this.mailboxCopier = mailboxCopier;
+    public MailboxManagerDefinition(String name, MailboxManager manager) {
+        this.name = name;
+        this.manager = manager;
     }
-
-    @Override
-    public Map<String, String> getMailboxManagerBeans() {
-        throw new NotImplementedException();
+    
+    public MailboxManager getManager() {
+        return manager;
     }
-
+    
+    public String getName() {
+        return name;
+    }
+    
     @Override
-    public void copy(String srcBean, String dstBean) throws Exception {
-        Class srcClass = ClassLoader.getSystemClassLoader().loadClass(srcBean);
-        Class dstClass = ClassLoader.getSystemClassLoader().loadClass(dstBean);
-        MailboxManager src = injector.<MailboxManager>getInstance(srcClass);
-        MailboxManager dst = injector.<MailboxManager>getInstance(dstClass);
-        mailboxCopier.copyMailboxes(src, dst);
+    public int hashCode() {
+        return Objects.hashCode(name, manager);
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MailboxManagerDefinition) {
+            MailboxManagerDefinition other = (MailboxManagerDefinition) obj;
+            return Objects.equal(name, other.name) && Objects.equal(manager, other.manager);
+        }
+        return false;
     }
 }

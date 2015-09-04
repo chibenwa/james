@@ -16,8 +16,20 @@
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
+package org.apache.james.adapter.mailbox;
 
-package org.apache.james.utils;
+public class MailboxManagerResolverException extends RuntimeException {
 
-public interface MailboxCopierManagementMBean extends org.apache.james.container.spring.mailbox.MailboxCopierManagementMBean {
+    public MailboxManagerResolverException() {
+        super();
+    }
+
+    public MailboxManagerResolverException(Throwable cause) {
+        super(cause);
+    }
+
+    public MailboxManagerResolverException(String message) {
+        super(message);
+    }
+
 }
