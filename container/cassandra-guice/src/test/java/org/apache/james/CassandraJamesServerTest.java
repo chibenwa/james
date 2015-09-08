@@ -18,14 +18,13 @@
  ****************************************************************/
 package org.apache.james;
 
-import java.util.Properties;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.mail.AuthenticationFailedException;
-import javax.mail.MessagingException;
-import javax.mail.NoSuchProviderException;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.Transport;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 
 import org.apache.james.mailbox.cassandra.CassandraClusterSingleton;
 import com.google.inject.util.Modules;
@@ -47,16 +46,19 @@ public class CassandraJamesServerTest {
     private static final int POP3_PORT = 1110;
     private static final int SMTP_PORT = 1025;
     private static final int LMTP_PORT = 1024;
+    public static final int BUFFER_SIZE = 1000;
 
     private CassandraJamesServer server;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
     private EmbeddedElasticSearch embeddedElasticSearch = new EmbeddedElasticSearch(temporaryFolder);
+    private SocketChannel socketChannel;
 
     @Rule
     public RuleChain chain = RuleChain.outerRule(temporaryFolder).around(embeddedElasticSearch);
 
     @Before
     public void setup() throws Exception {
+        socketChannel = SocketChannel.open();
         CASSANDRA.ensureAllTables();
 
         server = new CassandraJamesServer(Modules.override(CassandraJamesServerMain.defaultModule).with(new TestElasticSearchModule(embeddedElasticSearch)));
@@ -69,64 +71,41 @@ public class CassandraJamesServerTest {
         CASSANDRA.clearAllTables();
     }
 
-    @Test (expected = AuthenticationFailedException.class)
+    @Test
     public void connectIMAPServerShouldThrowWhenNoCredentials() throws Exception {
-        IMAPstore(IMAP_PORT).connect();
+        socketChannel.connect(new InetSocketAddress("127.0.0.1", IMAP_PORT));
+        assertThat(getServerConnectionResponse(socketChannel)).startsWith("* OK JAMES IMAP4rev1 Server");
     }
 
-    @Test (expected = AuthenticationFailedException.class)
+    @Test
     public void connectOnSecondaryIMAPServerIMAPServerShouldThrowWhenNoCredentials() throws Exception {
-        IMAPstore(IMAP_PORT_SSL).connect();
+        socketChannel.connect(new InetSocketAddress("127.0.0.1", IMAP_PORT_SSL));
+        assertThat(getServerConnectionResponse(socketChannel)).startsWith("* OK JAMES IMAP4rev1 Server");
     }
 
-    @Test (expected = AuthenticationFailedException.class)
+    @Test
     public void connectPOP3ServerShouldThrowWhenNoCredentials() throws Exception {
-        POP3store().connect();
+        socketChannel.connect(new InetSocketAddress("127.0.0.1", POP3_PORT));
+        assertThat(getServerConnectionResponse(socketChannel)).contains("POP3 server (JAMES POP3 Server ) ready");
     }
 
     @Test
     public void connectSMTPServerShouldNotThrowWhenNoCredentials() throws Exception {
-        SMTPTransport().connect();
+        socketChannel.connect(new InetSocketAddress("127.0.0.1", SMTP_PORT));
+        assertThat(getServerConnectionResponse(socketChannel)).startsWith("220 JAMES Linagora's SMTP awesome Server");
     }
 
-    @Test(expected = MessagingException.class)
+    @Test
     public void connectLMTPServerShouldNotThrowWhenNoCredentials() throws Exception {
-        LMTPTransport().connect();
+        socketChannel.connect(new InetSocketAddress("127.0.0.1", LMTP_PORT));
+        assertThat(getServerConnectionResponse(socketChannel)).contains("LMTP Server (JAMES Protocols Server) ready");
     }
 
-    private Store IMAPstore(int port) throws NoSuchProviderException {
-        Properties properties = new Properties();
-        properties.put("mail.imap.host", "localhost");
-        properties.put("mail.imap.port", String.valueOf(port));
-        Session session = Session.getDefaultInstance(properties);
-        session.setDebug(true);
-        return session.getStore("imap");
+    private String getServerConnectionResponse(SocketChannel socketChannel) throws IOException {
+        ByteBuffer byteBuffer = ByteBuffer.allocate(1000);
+        socketChannel.read(byteBuffer);
+        byte[] bytes = byteBuffer.array();
+        return new String(bytes, Charset.forName("UTF-8"));
     }
 
-    private Store POP3store() throws NoSuchProviderException {
-        Properties properties = new Properties();
-        properties.put("mail.pop3.host", "localhost");
-        properties.put("mail.pop3.port", String.valueOf(POP3_PORT));
-        Session session = Session.getDefaultInstance(properties);
-        session.setDebug(true);
-        return session.getStore("pop3");
-    }
-
-    private Transport SMTPTransport() throws NoSuchProviderException {
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "localhost");
-        properties.put("mail.smtp.port", String.valueOf(SMTP_PORT));
-        Session session = Session.getDefaultInstance(properties);
-        session.setDebug(true);
-        return session.getTransport("smtp");
-    }
-
-    private Transport LMTPTransport() throws NoSuchProviderException {
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "localhost");
-        properties.put("mail.smtp.port", String.valueOf(LMTP_PORT));
-        Session session = Session.getDefaultInstance(properties);
-        session.setDebug(true);
-        return session.getTransport("smtp");
-    }
 }
