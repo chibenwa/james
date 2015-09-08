@@ -46,13 +46,12 @@ public class ActiveMQQueueModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public MailQueueFactory createActiveMailQueueFactory(ConnectionFactory connectionFactory) {
-        ActiveMQMailQueueFactory result = new ActiveMQMailQueueFactory();
-        result.setUseJMX(true);
-        result.setConnectionFactory(connectionFactory);
-        result.setLog(LOGGER);
-        result.init();
-        return result;
+    public MailQueueFactory createActiveMailQueueFactory(ConnectionFactory connectionFactory, ActiveMQMailQueueFactory activeMQMailQueueFactory) {
+        activeMQMailQueueFactory.setUseJMX(true);
+        activeMQMailQueueFactory.setConnectionFactory(connectionFactory);
+        activeMQMailQueueFactory.setLog(LOGGER);
+        activeMQMailQueueFactory.init();
+        return activeMQMailQueueFactory;
     }
 
 }
