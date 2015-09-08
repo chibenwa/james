@@ -50,13 +50,14 @@ public class CassandraJamesServerMain {
         new POP3ServerModule(),
         new SMTPServerModule(),
         new LMTPServerModule(),
-        new JMXServerModule(),
         new SieveModule(),
         new CamelMailetContainerModule(),
         new ActiveMQQueueModule());
 
     public static void main(String[] args) throws Exception {
-        CassandraJamesServer server = new CassandraJamesServer(defaultModule);
+        CassandraJamesServer server = new CassandraJamesServer(Modules.combine(
+            defaultModule,
+            new JMXServerModule()));
         server.start();
     }
 
