@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.james.mailbox.MailboxManager;
 import org.apache.james.mailbox.copier.MailboxCopier;
