@@ -50,6 +50,7 @@ public class SendMailHandler implements JamesMessageHook {
     }
 
     @Override
+    @PostConstruct
     public void init(Configuration config) throws ConfigurationException {
         queue = queueFactory.getQueue(MailQueueFactory.SPOOL);
     }
