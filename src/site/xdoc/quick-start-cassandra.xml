@@ -34,41 +34,43 @@
 Step 0: Requirements
 ####################
 
-  * JRE 1.5+
-  * root (linux/unix) or Administrator (Windows)
-  * libc6 (linux)
+  * Java 8 SDK
   * 512MB RAM (launches with -Xmx512M - can use less, can need more, depending on load)
   * Docker 1.7.1+
+  * Maven 3.3
 
 Step 1: Download
 #################
 
   * Clone the James git repository
 
-<i>$ git clone https://github.com/apache/james.git</i>
+<i>$ git clone git://git.apache.org/james.git</i>
 
-  * Then go to the Cassandra container folder
+  * Then go to the James folder
   
-<i>$ cd james/container/cassandra-guice</i>
+<i>$ cd james</i>
 
-Step 2: Deploy
+Step 3: Compile
+###############
+
+  * Compile the Guice Cassandra project
+  
+<i>$ mvn package -DskipTests</i>
+
+Step 3: Deploy
 ##############
 
-2.1. Deploy Cassandra (optional)
+3.1. Deploy Cassandra (optional)
 You may skip this part if you already have a running Cassandra on your network.
 
 <i>$ docker run --name=cassandra cassandra</i>
 
-2.2. Deploy ElasticSearch (optional)
+3.2. Deploy ElasticSearch (optional)
 You may skip this part if you already have a running ElasticSearch on your network.
 
 <i>$ docker run --name=elasticsearch elasticsearch:1.5.2</i>
 
-2.3.Build the docker image
-
-<i>$ docker build --tag james-cassandra .</i>
-
-Step 3: Configure
+Step 4: Configure
 #################
 
   * Follow the <a href="config-guice.html">Cassandra guice</a> configuration documentation.
@@ -78,37 +80,37 @@ Copy your TSL keys to ./conf/keystore or generate it using :
 
 <i>$ keytool -genkey -alias james -keyalg RSA -keystore ./conf/keystore</i>
 
-Step 4: Start
+Step 5: Start
 #############
 
-  * Run the docker container
+  * Run James
 
-<i>$ docker run --hostname <b>HOSTNAME</b> -p "25:25" -p "110:110" -p "143:143" -p "465:465" -p "587:587" -p "993:993" 
-        --link cassandra:cassandra --link elasticsearch:elasticsearch --name james-cassandra -t james-cassandra</i>
+<i>$ java -Dconfiguration.directory=<b>CONFIGURATION_PATH</b> -jar container/cassandra-guice/target/james-server-cassandra-guice-beta5-SNAPSHOT.jar</i>
 
 Where :
-- <b>HOSTNAME</b> is the hostname you want to give to your James container.
-        This DNS entry will be used to send mail to your James server.
+- <b>CONFIGURATION_PATH</b> is the path where are located your configuration files.
 
-Step 5: Create Domains and Users
+Step 6: Create Domains and Users
 ################################
 
 Time to add domains and users.
 
-<i>$ docker exec james-cassandra /root/james-server-app-3.0.0-beta5-SNAPSHOT/bin/james-cli.sh -h 127.0.0.1 -p 9999 
-        adddomain <b>DOMAIN</b></i>
+Give enough rights to the James CLI
+
+<i>$ chmod 755 app/target/appassembler/bin/james-cli.sh</i>
+
+<i>$ ./app/target/appassembler/bin/james-cli.sh -h 127.0.0.1 -p 9999 adddomain <b>DOMAIN</b></i>
 
 Where :
 - <b>DOMAIN</b> is the domain you want to add.
 
-<i>$ docker exec james-cassandra /root/james-server-app-3.0.0-beta5-SNAPSHOT/bin/james-cli.sh -h 127.0.0.1 -p 9999 
-        adduser <b>USER_MAIL_ADDRESS</b> <b>PASSWORD</b></i>
+<i>$ ./app/target/appassembler/bin/james-cli.sh -h 127.0.0.1 -p 9999  adduser <b>USER_MAIL_ADDRESS</b> <b>PASSWORD</b></i>
 
 Where :
 - <b>USER_MAIL_ADDRESS</b> is the mail address that will be used by this user.
 - <b>PASSWORD</b> is the password that will be used by this user.
 
-Step 6: Test
+Step 8: Test
 ############
 
 $ telnet <b>HOSTNAME</b> 25
@@ -135,10 +137,10 @@ this is a test
 quit
 Connection closed by foreign host.
 
-Step 7: Manage
+Step 8: Manage
 ##############
 
-7.1. Manage via james-cli
+8.1. Manage via james-cli
 
   usage: 
 <i>$ docker exec james-cassandra /root/james-server-app-3.0.0-beta5-SNAPSHOT/bin/james-cli.sh -h 127.0.0.1 -p 9999</i>
@@ -151,12 +153,12 @@ Step 7: Manage
     removedomain &lt;/domainname&gt;
     listdomains
 
-7.2. Manage via JMX
+8.2. Manage via JMX
 
   * Launch jconsole (or any other JMX client) and connect on URL=service:jmx:rmi:///jndi/rmi://localhost:<b>HOSTNAME</b>/jmxrmi
   * Select the MBeans tab and open the org.apache.james node to view attributes and execute operations.
 
-Step 8: Monitor
+Step 9: Monitor
 ###############
 
   * Monitor the ./log/james-server.log log file.

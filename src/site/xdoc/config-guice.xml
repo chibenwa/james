@@ -32,7 +32,8 @@
        Have a look to the <i>james-server-cassandra-guice</i> artifact.
     </p>
 
-    <p>All configuration files resides in the <i>./conf</i> folder.</p>
+    <p>We provide a sample-configuration folder with needed files to run James. 
+      You can start by copying it and modify these files according to your needs.</p>
 
     <p>You can/must configure James for the following:</p>
 
