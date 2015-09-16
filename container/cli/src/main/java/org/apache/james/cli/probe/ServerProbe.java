@@ -18,6 +18,10 @@
  ****************************************************************/
 package org.apache.james.cli.probe;
 
+import org.apache.james.mailbox.exception.MailboxException;
+import org.apache.james.mailbox.model.Quota;
+import org.apache.james.mailbox.model.QuotaRoot;
+
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.Map;
@@ -217,4 +221,26 @@ public interface ServerProbe extends Closeable {
      * @param name Name of the mailbox to delete
      */
     void deleteMailbox(String namespace, String user, String name);
+
+    QuotaRoot getQuotaRoot(String namespace, String user, String name) throws MailboxException;
+
+    Quota getMessageCountQuota(String quotaRoot) throws MailboxException;
+
+    Quota getStorageQuota(String quotaRoot) throws MailboxException;
+
+    long getMaxMessageCount(String quotaRoot) throws MailboxException;
+
+    long getMaxStorage(String quotaRoot) throws MailboxException;
+
+    long getDefaultMaxMessageCount() throws MailboxException;
+
+    long getDefaultMaxStorage() throws MailboxException;
+
+    void setMaxMessageCount(String quotaRoot, long maxMessageCount) throws MailboxException;
+
+    void setMaxStorage(String quotaRoot, long maxSize) throws MailboxException;
+
+    void setDefaultMaxMessageCount(long maxDefaultMessageCount) throws MailboxException;
+
+    void setDefaultMaxStorage(long maxDefaultSize) throws MailboxException;
 }
