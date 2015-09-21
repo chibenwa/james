@@ -37,7 +37,6 @@ import org.apache.james.cli.probe.ServerProbe;
 import org.apache.james.domainlist.api.DomainListManagementMBean;
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.Quota;
-import org.apache.james.mailbox.model.QuotaRoot;
 import org.apache.james.rrt.api.RecipientRewriteTableManagementMBean;
 import org.apache.james.user.api.UsersRepositoryManagementMBean;
 
