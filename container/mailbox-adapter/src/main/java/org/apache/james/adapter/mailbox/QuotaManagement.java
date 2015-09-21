@@ -22,14 +22,9 @@ package org.apache.james.adapter.mailbox;
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.MailboxPath;
 import org.apache.james.mailbox.model.Quota;
-import org.apache.james.mailbox.model.QuotaRoot;
 import org.apache.james.mailbox.quota.MaxQuotaManager;
 import org.apache.james.mailbox.quota.QuotaManager;
 import org.apache.james.mailbox.quota.QuotaRootResolver;
-import org.apache.james.mailbox.store.quota.QuotaRootImpl;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 public class QuotaManagement implements QuotaManagementMBean {
 
@@ -50,8 +45,8 @@ public class QuotaManagement implements QuotaManagementMBean {
     }
 
     @Override
-    public QuotaRoot getQuotaRoot(String namespace, String user, String name) throws MailboxException {
-        return quotaRootResolver.getQuotaRoot(new MailboxPath(namespace, user, name));
+    public String getQuotaRoot(String namespace, String user, String name) throws MailboxException {
+        return quotaRootResolver.getQuotaRoot(new MailboxPath(namespace, user, name)).getValue();
     }
 
     @Override

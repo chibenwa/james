@@ -21,10 +21,9 @@ package org.apache.james.adapter.mailbox;
 
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.Quota;
-import org.apache.james.mailbox.model.QuotaRoot;
 
 public interface QuotaManagementMBean {
-    QuotaRoot getQuotaRoot(String namespace, String user, String name) throws MailboxException;
+    String getQuotaRoot(String namespace, String user, String name) throws MailboxException;
 
     Quota getMessageCountQuota(String quotaRoot) throws MailboxException;
 
