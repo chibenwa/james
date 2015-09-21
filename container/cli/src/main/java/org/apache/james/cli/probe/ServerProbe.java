@@ -222,7 +222,7 @@ public interface ServerProbe extends Closeable {
      */
     void deleteMailbox(String namespace, String user, String name);
 
-    QuotaRoot getQuotaRoot(String namespace, String user, String name) throws MailboxException;
+    String getQuotaRoot(String namespace, String user, String name) throws MailboxException;
 
     Quota getMessageCountQuota(String quotaRoot) throws MailboxException;
 

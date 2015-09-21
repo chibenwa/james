@@ -225,7 +225,7 @@ public class JmxServerProbe implements ServerProbe {
     }
 
     @Override
-    public QuotaRoot getQuotaRoot(String namespace, String user, String name) throws MailboxException {
+    public String getQuotaRoot(String namespace, String user, String name) throws MailboxException {
         return quotaManagement.getQuotaRoot(namespace, user, name);
     }
 

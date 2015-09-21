@@ -226,7 +226,7 @@ public class ServerCmd {
             printMessageQuota(arguments[1], probe.getMessageCountQuota(arguments[1]));
             break;
         case GETQUOTAROOT:
-            System.out.println("Quota Root : " + probe.getQuotaRoot(arguments[1], arguments[2], arguments[3]).getValue());
+            System.out.println("Quota Root : " + probe.getQuotaRoot(arguments[1], arguments[2], arguments[3]));
             break;
         case GETMAXSTORAGEQUOTA:
             System.out.println("Storage space allowed for Quota Root "

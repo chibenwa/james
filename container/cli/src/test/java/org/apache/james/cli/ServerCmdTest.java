@@ -39,7 +39,6 @@ import org.apache.james.cli.probe.ServerProbe;
 import org.apache.james.cli.type.CmdType;
 import org.apache.james.mailbox.model.Quota;
 import org.apache.james.mailbox.store.quota.QuotaImpl;
-import org.apache.james.mailbox.store.quota.QuotaRootImpl;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -343,7 +342,7 @@ public class ServerCmdTest {
         String[] arguments = { "-h", "127.0.0.1", "-p", "9999", CmdType.GETQUOTAROOT.getCommand(), namespace, user, name};
         CommandLine commandLine = ServerCmd.parseCommandLine(arguments);
 
-        expect(serverProbe.getQuotaRoot(namespace, user, name)).andReturn(QuotaRootImpl.quotaRoot(namespace + "&" + user));
+        expect(serverProbe.getQuotaRoot(namespace, user, name)).andReturn(namespace + "&" + user);
 
         control.replay();
         testee.executeCommandLine(commandLine);
