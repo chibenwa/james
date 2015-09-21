@@ -19,28 +19,31 @@
 
 package org.apache.james.adapter.mailbox;
 
-import org.apache.james.mailbox.exception.MailboxException;
+import org.apache.james.mailbox.model.Quota;
 
-public interface QuotaManagementMBean {
-    String getQuotaRoot(String namespace, String user, String name) throws MailboxException;
+import java.io.Serializable;
 
-    SerializableQuota getMessageCountQuota(String quotaRoot) throws MailboxException;
+public class SerializableQuota implements Serializable {
 
-    SerializableQuota getStorageQuota(String quotaRoot) throws MailboxException;
+    private final long max;
+    private final long used;
 
-    long getMaxMessageCount(String quotaRoot) throws MailboxException;
+    public SerializableQuota(long max, long used) {
+        this.max = max;
+        this.used = used;
+    }
 
-    long getMaxStorage(String quotaRoot) throws MailboxException;
+    public SerializableQuota(Quota quota) {
+        this.max = quota.getMax();
+        this.used = quota.getUsed();
+    }
 
-    long getDefaultMaxMessageCount() throws MailboxException;
+    public long getMax() {
+        return max;
+    }
 
-    long getDefaultMaxStorage() throws MailboxException;
+    public long getUsed() {
+        return used;
+    }
 
-    void setMaxMessageCount(String quotaRoot, long maxMessageCount) throws MailboxException;
-
-    void setMaxStorage(String quotaRoot, long maxSize) throws MailboxException;
-
-    void setDefaultMaxMessageCount(long maxDefaultMessageCount) throws MailboxException;
-
-    void setDefaultMaxStorage(long maxDefaultSize) throws MailboxException;
 }

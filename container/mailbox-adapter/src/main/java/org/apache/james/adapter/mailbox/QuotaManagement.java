@@ -21,7 +21,6 @@ package org.apache.james.adapter.mailbox;
 
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.MailboxPath;
-import org.apache.james.mailbox.model.Quota;
 import org.apache.james.mailbox.quota.MaxQuotaManager;
 import org.apache.james.mailbox.quota.QuotaManager;
 import org.apache.james.mailbox.quota.QuotaRootResolver;
@@ -90,12 +89,12 @@ public class QuotaManagement implements QuotaManagementMBean {
     }
 
     @Override
-    public Quota getMessageCountQuota(String quotaRoot) throws MailboxException {
-        return quotaManager.getMessageQuota(quotaRootResolver.createQuotaRoot(quotaRoot));
+    public SerializableQuota getMessageCountQuota(String quotaRoot) throws MailboxException {
+        return new SerializableQuota(quotaManager.getMessageQuota(quotaRootResolver.createQuotaRoot(quotaRoot)));
     }
 
     @Override
-    public Quota getStorageQuota(String quotaRoot) throws MailboxException {
-        return quotaManager.getStorageQuota(quotaRootResolver.createQuotaRoot(quotaRoot));
+    public SerializableQuota getStorageQuota(String quotaRoot) throws MailboxException {
+        return new SerializableQuota(quotaManager.getStorageQuota(quotaRootResolver.createQuotaRoot(quotaRoot)));
     }
 }
