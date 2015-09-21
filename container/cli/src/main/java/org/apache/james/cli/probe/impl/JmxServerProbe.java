@@ -33,10 +33,10 @@ import javax.management.remote.JMXServiceURL;
 import org.apache.james.adapter.mailbox.MailboxCopierManagementMBean;
 import org.apache.james.adapter.mailbox.MailboxManagerManagementMBean;
 import org.apache.james.adapter.mailbox.QuotaManagementMBean;
+import org.apache.james.adapter.mailbox.SerializableQuota;
 import org.apache.james.cli.probe.ServerProbe;
 import org.apache.james.domainlist.api.DomainListManagementMBean;
 import org.apache.james.mailbox.exception.MailboxException;
-import org.apache.james.mailbox.model.Quota;
 import org.apache.james.rrt.api.RecipientRewriteTableManagementMBean;
 import org.apache.james.user.api.UsersRepositoryManagementMBean;
 
@@ -229,12 +229,12 @@ public class JmxServerProbe implements ServerProbe {
     }
 
     @Override
-    public Quota getMessageCountQuota(String quotaRoot) throws MailboxException {
+    public SerializableQuota getMessageCountQuota(String quotaRoot) throws MailboxException {
         return quotaManagement.getMessageCountQuota(quotaRoot);
     }
 
     @Override
-    public Quota getStorageQuota(String quotaRoot) throws MailboxException {
+    public SerializableQuota getStorageQuota(String quotaRoot) throws MailboxException {
         return quotaManagement.getStorageQuota(quotaRoot);
     }
 

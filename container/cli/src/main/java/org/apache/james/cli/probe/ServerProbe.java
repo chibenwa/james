@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.james.cli.probe;
 
+import org.apache.james.adapter.mailbox.SerializableQuota;
 import org.apache.james.mailbox.exception.MailboxException;
 import org.apache.james.mailbox.model.Quota;
 import org.apache.james.mailbox.model.QuotaRoot;
@@ -224,9 +225,9 @@ public interface ServerProbe extends Closeable {
 
     String getQuotaRoot(String namespace, String user, String name) throws MailboxException;
 
-    Quota getMessageCountQuota(String quotaRoot) throws MailboxException;
+    SerializableQuota getMessageCountQuota(String quotaRoot) throws MailboxException;
 
-    Quota getStorageQuota(String quotaRoot) throws MailboxException;
+    SerializableQuota getStorageQuota(String quotaRoot) throws MailboxException;
 
     long getMaxMessageCount(String quotaRoot) throws MailboxException;
 

@@ -31,6 +31,7 @@ import java.util.HashMap;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.james.adapter.mailbox.SerializableQuota;
 import org.apache.james.cli.exceptions.InvalidArgumentNumberException;
 import org.apache.james.cli.exceptions.InvalidPortException;
 import org.apache.james.cli.exceptions.MissingCommandException;
@@ -38,7 +39,6 @@ import org.apache.james.cli.exceptions.UnrecognizedCommandException;
 import org.apache.james.cli.probe.ServerProbe;
 import org.apache.james.cli.type.CmdType;
 import org.apache.james.mailbox.model.Quota;
-import org.apache.james.mailbox.store.quota.QuotaImpl;
 import org.easymock.IMocksControl;
 import org.junit.Before;
 import org.junit.Test;
@@ -459,7 +459,7 @@ public class ServerCmdTest {
         String[] arguments = { "-h", "127.0.0.1", "-p", "9999", CmdType.GETSTORAGEQUOTA.getCommand(), quotaroot};
         CommandLine commandLine = ServerCmd.parseCommandLine(arguments);
 
-        expect(serverProbe.getStorageQuota(quotaroot)).andReturn(QuotaImpl.unlimited());
+        expect(serverProbe.getStorageQuota(quotaroot)).andReturn(new SerializableQuota(Quota.UNLIMITED, Quota.UNKNOWN));
 
         control.replay();
         testee.executeCommandLine(commandLine);
@@ -472,7 +472,7 @@ public class ServerCmdTest {
         String[] arguments = { "-h", "127.0.0.1", "-p", "9999", CmdType.GETMESSAGECOUNTQUOTA.getCommand(), quotaroot};
         CommandLine commandLine = ServerCmd.parseCommandLine(arguments);
 
-        expect(serverProbe.getMessageCountQuota(quotaroot)).andReturn(QuotaImpl.unlimited());
+        expect(serverProbe.getMessageCountQuota(quotaroot)).andReturn(new SerializableQuota(Quota.UNLIMITED, Quota.UNKNOWN));
 
         control.replay();
         testee.executeCommandLine(commandLine);

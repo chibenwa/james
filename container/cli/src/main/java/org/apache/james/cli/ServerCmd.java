@@ -29,6 +29,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.james.adapter.mailbox.SerializableQuota;
 import org.apache.james.cli.exceptions.InvalidArgumentNumberException;
 import org.apache.james.cli.exceptions.InvalidPortException;
 import org.apache.james.cli.exceptions.JamesCliException;
@@ -269,13 +270,14 @@ public class ServerCmd {
         }
     }
 
-    private void printStorageQuota(String quotaRootString, Quota quota) {
+    private void printStorageQuota(String quotaRootString, SerializableQuota quota) {
         System.out.println(String.format("Storage quota for %s is : %s / %s",
             quotaRootString,
             FileUtils.byteCountToDisplaySize(quota.getUsed()),
             FileUtils.byteCountToDisplaySize(quota.getMax())));
     }
-    private void printMessageQuota(String quotaRootString, Quota quota) {
+
+    private void printMessageQuota(String quotaRootString, SerializableQuota quota) {
         System.out.println(String.format("Message count quota for %s is : %d / %d",
             quotaRootString,
             quota.getUsed(),
