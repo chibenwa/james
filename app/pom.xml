@@ -461,6 +461,18 @@
         </dependency>
         <dependency>
             <groupId>org.apache.james</groupId>
+            <artifactId>apache-james-mailbox-hystrix</artifactId>
+            <scope>runtime</scope>
+            <version>0.6-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mail</artifactId>
+                    <groupId>javax.mail</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
             <artifactId>apache-james-mailbox-elasticsearch</artifactId>
             <scope>runtime</scope>
             <exclusions>

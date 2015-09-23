@@ -117,6 +117,9 @@
 
     <import resource="classpath:META-INF/spring/spring-mailbox.xml"/>
 
+    <!-- Hystrix support-->
+    <import resource="classpath:META-INF/spring/mailbox-hystrix.xml"/>
+
     <!-- Quotas -->
     <bean class="org.apache.james.container.spring.bean.factorypostprocessor.QuotaBeanFactoryPostProcessor"/>
 

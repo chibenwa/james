@@ -46,6 +46,7 @@ public class MailboxConfigurationBeanFactoryPostProcessor implements BeanFactory
         try {
             HierarchicalConfiguration config = confProvider.getConfiguration("mailbox");
             String provider = config.getString("provider", "jpa");
+            boolean enableHystrix = config.getBoolean("enableHystrix", false);
 
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
             String mailbox = null;
@@ -79,6 +80,12 @@ public class MailboxConfigurationBeanFactoryPostProcessor implements BeanFactory
 
             if (mailbox == null)
                 throw new ConfigurationException("Mailboxmanager provider " + provider + " not supported!");
+
+            if (enableHystrix) {
+                registry.registerAlias(messageMapperFactory, "wrap-me-mailboxsessionfactory");
+                messageMapperFactory = "hystrix-mailboxsessionfactory";
+            }
+
             registry.registerAlias(mailbox, "mailboxmanager");
             registry.registerAlias(subscription, "subscriptionManager");
             registry.registerAlias(messageMapperFactory, "messageMapperFactory");
