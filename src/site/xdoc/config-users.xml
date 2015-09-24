@@ -231,6 +231,20 @@
 -->    
      </subsection>
 
+      <subsection name="Hystrix integration">
+          <p>
+              Finally, you will notice the possibility to enable Hystrix wrapping for your Domain List.
+          </p>
+          <p>
+              To do so, you need to switch enableHystrix to "true".
+          </p>
+          <p>
+              Hystrix is a Netflix library. It allows you to better handle failures in a (distributed) system. It provides fallback and a circuit breaker.
+              This means your backend will not be to much overloaded as circuits will be open before.
+              In addition Hystrix provides live metrics, and support live configuration.
+          </p>
+      </subsection>
+
   </section>
 
 </body>
