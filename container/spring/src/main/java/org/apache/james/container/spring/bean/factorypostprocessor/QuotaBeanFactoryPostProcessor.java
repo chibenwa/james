@@ -42,6 +42,7 @@ public class QuotaBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
     private static final String UPDATES = "updates";
     private static final String QUOTA_ROOT_RESOLVER = "quotaRootResolver";
     private static final String EVENT = "event";
+    public static final String ENABLE_HYSTRIX = "enableHystrix";
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
@@ -54,12 +55,14 @@ public class QuotaBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
             String maxQuotaManager = config.configurationAt(MAX_QUOTA_MANAGER).getString(PROVIDER, FAKE);
             String quotaManager = config.configurationAt(QUOTA_MANAGER).getString(PROVIDER, FAKE);
             String quotaUpdater = config.configurationAt(UPDATES).getString(PROVIDER, FAKE);
+            boolean enableHystrixForMaxQuotaManager = config.configurationAt(MAX_QUOTA_MANAGER).getBoolean(ENABLE_HYSTRIX, false);
+            boolean enableHystrixForCurrentQuotaManager = config.configurationAt(CURRENT_QUOTA_MANAGER).getBoolean(ENABLE_HYSTRIX, false);
 
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
             registerAliasForQuotaRootResolver(quotaRootResolver, registry);
-            registerAliasForCurrentQuotaManager(currentQuotaManager, registry);
-            registerAliasForMaxQuotaManager(maxQuotaManager, registry);
+            registerAliasForCurrentQuotaManager(currentQuotaManager, registry, enableHystrixForCurrentQuotaManager);
+            registerAliasForMaxQuotaManager(maxQuotaManager, registry, enableHystrixForMaxQuotaManager);
             registerAliasForQuotaManager(quotaManager, registry);
             registerAliasForQuotaUpdater(quotaUpdater, registry);
         } catch (ConfigurationException e) {
@@ -87,26 +90,47 @@ public class QuotaBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
         }
     }
 
-    private void registerAliasForMaxQuotaManager(String maxQuotaManager, BeanDefinitionRegistry registry) {
+    private void registerAliasForMaxQuotaManager(String maxQuotaManager, BeanDefinitionRegistry registry, boolean enableHystrixForMaxQuotaManager) {
+        String maxQuotaManagerBean = getMaxQuotaManagerBeanName(maxQuotaManager);
+        if (enableHystrixForMaxQuotaManager) {
+            registry.registerAlias(maxQuotaManagerBean, "wrap-me-maxquotamanager");
+            maxQuotaManagerBean = "hystrix-maxquotamanager";
+        }
+        registry.registerAlias(maxQuotaManagerBean, MAX_QUOTA_MANAGER);
+    }
+
+    private String getMaxQuotaManagerBeanName(String maxQuotaManager) {
         if (maxQuotaManager.equalsIgnoreCase(FAKE)) {
-            registry.registerAlias("noMaxQuotaManager", MAX_QUOTA_MANAGER);
+            return "noMaxQuotaManager";
         } else if (maxQuotaManager.equalsIgnoreCase(IN_MEMORY)) {
-            registry.registerAlias("inMemoryMaxQuotaManager", MAX_QUOTA_MANAGER);
+            return "inMemoryMaxQuotaManager";
         } else if (maxQuotaManager.equalsIgnoreCase(CASSANDRA)) {
-            registry.registerAlias("cassandraMaxQuotaManager", MAX_QUOTA_MANAGER);
+            return "cassandraMaxQuotaManager";
         } else {
             throw new FatalBeanException("Unreadable value for Max Quota Manager : " + maxQuotaManager);
         }
     }
 
-    private void registerAliasForCurrentQuotaManager(String currentQuotaManager, BeanDefinitionRegistry registry) {
+    private void registerAliasForCurrentQuotaManager(String currentQuotaManager, BeanDefinitionRegistry registry, boolean enableHystrixForCurrentQuotaManager) {
+        String currentQuotaManagerBean = getCurrentQuotaManagerBean(currentQuotaManager);
+        if (currentQuotaManagerBean != null) {
+            if (enableHystrixForCurrentQuotaManager) {
+                registry.registerAlias(currentQuotaManagerBean, "wrap-me-currentquotamanager");
+                currentQuotaManagerBean = "hystrix-currentquotamanager";
+            }
+            registry.registerAlias(currentQuotaManagerBean, CURRENT_QUOTA_MANAGER);
+        }
+    }
+
+    private String getCurrentQuotaManagerBean(String currentQuotaManager) {
         if (currentQuotaManager.equalsIgnoreCase(IN_MEMORY)) {
-            registry.registerAlias("inMemoryCurrentQuotaManager", CURRENT_QUOTA_MANAGER);
+            return "inMemoryCurrentQuotaManager";
         } else if (currentQuotaManager.equalsIgnoreCase(CASSANDRA)) {
-            registry.registerAlias("cassandraCurrentQuotaManager", CURRENT_QUOTA_MANAGER);
+            return "cassandraCurrentQuotaManager";
         } else if (! currentQuotaManager.equalsIgnoreCase("none")) {
             throw new FatalBeanException("Unreadable value for Current Quota Manager : " + currentQuotaManager);
         }
+        return currentQuotaManager;
     }
 
     private void registerAliasForQuotaRootResolver(String quotaRootResolver, BeanDefinitionRegistry registry) {
