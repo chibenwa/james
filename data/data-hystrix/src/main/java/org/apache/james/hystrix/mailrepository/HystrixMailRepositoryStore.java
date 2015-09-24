@@ -16,40 +16,29 @@
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.container.spring.lifecycle;
 
-import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.james.lifecycle.api.Configurable;
+package org.apache.james.hystrix.mailrepository;
 
-/**
- * Inject Commons Configuration to beans which implement the Configurable
- * interface
- */
-public class ConfigurableBeanPostProcessor extends AbstractLifecycleBeanPostProcessor<Configurable> {
+import org.apache.james.mailrepository.api.MailRepository;
+import org.apache.james.mailrepository.api.MailRepositoryStore;
 
-    private ConfigurationProvider provider;
+import java.util.List;
 
-    public void setConfigurationProvider(ConfigurationProvider provider) {
-        this.provider = provider;
+public class HystrixMailRepositoryStore implements MailRepositoryStore {
+
+    private final MailRepositoryStore mailRepositoryStore;
+
+    public HystrixMailRepositoryStore(MailRepositoryStore mailRepositoryStore) {
+        this.mailRepositoryStore = mailRepositoryStore;
     }
 
     @Override
-    protected Class<Configurable> getLifeCycleInterface() {
-        return Configurable.class;
+    public MailRepository select(String url) throws MailRepositoryStoreException {
+        return new HystrixMailRepository(mailRepositoryStore.select(url));
     }
 
     @Override
-    protected void executeLifecycleMethodBeforeInit(Configurable bean, String beanname) throws Exception {
-        if (beanname.startsWith("real-")) {
-            beanname = beanname.substring(5);
-        }
-        HierarchicalConfiguration config = provider.getConfiguration(beanname);
-        bean.configure(config);
+    public List<String> getUrls() {
+        return mailRepositoryStore.getUrls();
     }
-
-    @Override
-    protected void executeLifecycleMethodAfterInit(Configurable bean, String beanname) throws Exception {
-        // Do nothing.
-    }
-
 }

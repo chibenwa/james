@@ -36,6 +36,12 @@
   MD5, SHA-256, SHA-512, NONE
 -->
 <usersrepository name="LocalUsers" class="org.apache.james.user.jpa.JPAUsersRepository">
+    <!--
+            Hystrix is a Netfix library for handling errors in a distributed system.
+
+            It provides circuit breakers, fallback mechanisms, and live metrics for every command performed.
+        -->
+    <enableHystrix>false</enableHystrix>
     <algorithm>MD5</algorithm>
     <enableVirtualHosting>true</enableVirtualHosting>    
 </usersrepository>
@@ -54,6 +60,7 @@
 <!-- DEPRECATED: This implementation will get removed in the next release -->
 <!--
 <usersrepository name="LocalUsers" class="org.apache.james.user.file.UsersFileRepository">
+    <enableHystrix>false</enableHystrix>
     <destination URL="file://var/users/"/>
     <ignoreCase>true</ignoreCase>
     <enableAliases>true</enableAliases>
@@ -72,6 +79,7 @@
 <!--             Use JPAUsersRepository if you want to store the Users in a database -->
 <!-- 
 <usersrepository name="LocalUsers" class="org.apache.james.user.jdbc.JamesUsersJdbcRepository" destinationURL="db://maildb/users">
+    <enableHystrix>false</enableHystrix>
     <sqlFile>file://conf/sqlResources.xml</sqlFile>
     <ignoreCase>true</ignoreCase>
     <enableAliases>true</enableAliases>

@@ -41,6 +41,8 @@
 
     <import resource="classpath:META-INF/spring/loaders-context.xml"/>
 
+    <bean class="org.apache.james.container.spring.bean.factorypostprocessor.MailrepositoryConfigurationBeanFactoryPostProcessor"/>
+
     <!-- 
     ===========================================================================
        Authenticator

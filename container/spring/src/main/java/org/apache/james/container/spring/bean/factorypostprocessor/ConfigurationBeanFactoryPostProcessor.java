@@ -67,11 +67,12 @@ public class ConfigurationBeanFactoryPostProcessor implements BeanFactoryPostPro
 
                 // Get the configuration for the class
                 String repClass = config.getString("[@class]");
+                boolean enableHystrix = config.getBoolean("enableHystrix", false);
 
                 // Create the definition and register it
                 BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
                 BeanDefinition def = BeanDefinitionBuilder.genericBeanDefinition(repClass).getBeanDefinition();
-                registry.registerBeanDefinition(name, def);
+                registry.registerBeanDefinition("real-" + name, def);
 
                 String aliases = beans.get(name);
                 String[] aliasArray = aliases.split(",");
@@ -86,6 +87,11 @@ public class ConfigurationBeanFactoryPostProcessor implements BeanFactoryPostPro
                     }
                 }
 
+                if (enableHystrix) {
+                    registry.registerAlias("hystrix-" + name, name);
+                } else {
+                    registry.registerAlias("real-" + name, name);
+                }
             } catch (ConfigurationException e) {
                 throw new FatalBeanException("Unable to parse configuration for bean " + name, e);
             }

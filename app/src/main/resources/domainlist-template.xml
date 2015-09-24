@@ -45,14 +45,21 @@
 
 <!-- JPA implementation for DomainList -->
 <domainlist class="org.apache.james.domainlist.jpa.JPADomainList">
-   <autodetect>true</autodetect>
-   <autodetectIP>true</autodetectIP>
-   <defaultDomain>localhost</defaultDomain>
+    <!--
+            Hystrix is a Netfix library for handling errors in a distributed system.
+
+            It provides circuit breakers, fallback mechanisms, and live metrics for every command performed.
+        -->
+    <enableHystrix>false</enableHystrix>
+    <autodetect>true</autodetect>
+    <autodetectIP>true</autodetectIP>
+    <defaultDomain>localhost</defaultDomain>
 </domainlist>
 
 <!-- XML based implementation for DomainList -->
 <!-- 
 <domainlist class="org.apache.james.domainlist.xml.XMLDomainList">
+   <enableHystrix>false</enableHystrix>
    <domainnames>
        <domainname>localhost</domainname>
    </domainnames>

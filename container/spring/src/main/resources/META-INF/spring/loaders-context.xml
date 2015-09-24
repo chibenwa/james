@@ -32,6 +32,8 @@
     <bean id="logprovider" class="org.apache.james.container.spring.lifecycle.LogProviderImpl">
     </bean>
 
+    <import resource="classpath:META-INF/spring/hystrix-data.xml"/>
+
     <!--
       Configuration "Bean-Factory-Post-Processor"
         responsible to register beans from James specific configuration files
@@ -91,8 +93,14 @@
     </bean>
 
     <!-- Mail Repository Store "Bean-Factory" -->
-    <bean id="mailrepositorystore"
+    <bean id="real-mailrepositorystore"
           class="org.apache.james.container.spring.bean.factory.mailrepositorystore.MailRepositoryStoreBeanFactory"/>
+
+    <bean id="hystrix-mailrepositorystore"
+          class="org.apache.james.hystrix.mailrepository.HystrixMailRepositoryStore"
+          lazy-init="true">
+        <constructor-arg index="0" ref="real-mailrepositorystore"/>
+    </bean>
 
     <!--  Mailet and Matcher "Bean-Factory". -->
 
