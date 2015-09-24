@@ -46,6 +46,7 @@ public class IndexerConfigurationBeanFactoryPostProcessor implements BeanFactory
         try {
             HierarchicalConfiguration config = confProvider.getConfiguration("indexer");
             String provider = config.getString("provider", "lazyIndex");
+            boolean enableHystrix = config.getBoolean("enableHystrix", false);
 
             BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
             String indexer = null;
@@ -57,6 +58,12 @@ public class IndexerConfigurationBeanFactoryPostProcessor implements BeanFactory
 
             if (indexer == null)
                 throw new ConfigurationException("Indexer provider " + provider + " not supported!");
+
+            if (enableHystrix) {
+                registry.registerAlias(indexer, "wrapped-indexer");
+                indexer = "hystrix-indexer";
+            }
+
             registry.registerAlias(indexer, "indexer");
 
         } catch (ConfigurationException e) {

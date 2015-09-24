@@ -30,4 +30,10 @@
    <!-- lazyIndex, elasticsearch -->
    <!--  -->
   <provider>lazyIndex</provider>
+    <!--
+    Hystrix is a Netfix library for handling errors in a distributed system.
+
+    It provides circuit breakers, fallback mechanisms, and live metrics for every command performed.
+    -->
+    <enableHystrix>false</enableHystrix>
 </indexer>
