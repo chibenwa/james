@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.sql.DataSource;
 
@@ -63,7 +64,7 @@ public abstract class AbstractSQLWhitelistMatcher extends GenericMatcher {
     }
 
     @Inject
-    public void setUsersRepository(UsersRepository localusers) {
+    public void setUsersRepository(@Named("usersrepository") UsersRepository localusers) {
         this.localusers = localusers;
     }
 

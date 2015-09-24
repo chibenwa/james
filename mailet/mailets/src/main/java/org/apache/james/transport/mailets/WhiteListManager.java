@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -165,7 +166,7 @@ public class WhiteListManager extends GenericMailet {
     }
 
     @Inject
-    public void setUsersRepository(UsersRepository localusers) {
+    public void setUsersRepository(@Named("usersrepository") UsersRepository localusers) {
         this.localusers = localusers;
     }
 

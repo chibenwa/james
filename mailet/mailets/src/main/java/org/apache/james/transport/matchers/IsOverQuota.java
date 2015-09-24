@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.MessagingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,12 +34,12 @@ public class IsOverQuota extends GenericMatcher {
     }
 
     @Inject
-    public void setQuotaManager(QuotaManager quotaManager) {
+    public void setQuotaManager(@Named("quotaManager") QuotaManager quotaManager) {
         this.quotaManager = quotaManager;
     }
 
     @Inject
-    public void setMailboxManager(MailboxManager mailboxManager) {
+    public void setMailboxManager(@Named("mailboxmanager") MailboxManager mailboxManager) {
         this.mailboxManager = mailboxManager;
     }
 

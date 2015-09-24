@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.MessagingException;
 
 import org.apache.commons.collections.iterators.IteratorChain;
@@ -53,9 +54,11 @@ import org.apache.mailet.base.GenericMailet;
 public class ToRecipientFolder extends GenericMailet {
 
     @Inject
+    @Named("mailboxmanager")
     private MailboxManager mailboxManager;
     
     @Inject
+    @Named("usersrepository")
     private UsersRepository usersRepository;
     
     @Inject

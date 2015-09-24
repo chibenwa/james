@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import java.util.regex.PatternSyntaxException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.mail.internet.ParseException;
 
@@ -60,7 +61,7 @@ public abstract class AbstractRecipientRewriteTable extends GenericMailet {
     }
 
     @Inject
-    public void setDomainList(DomainList domainList) {
+    public void setDomainList(@Named("domainlist") DomainList domainList) {
         this.domainList = domainList;
     }
 

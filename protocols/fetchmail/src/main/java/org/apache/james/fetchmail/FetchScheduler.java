@@ -29,6 +29,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -83,13 +84,13 @@ public class FetchScheduler implements FetchSchedulerMBean, LogEnabled, Configur
 
     @Inject
     @Resource
-    public void setUsersRepository(UsersRepository urepos) {
+    public void setUsersRepository(@Named("usersrepository") UsersRepository urepos) {
         this.urepos = urepos;
     }
 
     @Inject
     @Resource
-    public void setDomainList(DomainList domainList) {
+    public void setDomainList(@Named("domainlist") DomainList domainList) {
         this.domainList = domainList;
     }
 

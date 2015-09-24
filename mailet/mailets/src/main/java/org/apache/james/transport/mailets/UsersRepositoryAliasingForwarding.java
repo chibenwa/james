@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
@@ -66,7 +67,7 @@ public class UsersRepositoryAliasingForwarding extends AbstractRecipientRewriteT
     }
 
     @Inject
-    public void setUsersRepository(UsersRepository usersRepository) {
+    public void setUsersRepository(@Named("usersrepository") UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
